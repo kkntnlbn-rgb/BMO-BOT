@@ -1,6 +1,6 @@
 ---
-name: "brand-guidelines"
-description: "Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. Builds the color system, type scale and tone matrix, including Anthropic's identity."
+name: brand-guidelines
+description: Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. Builds the color system, type scale and tone matrix for any brand.
 license: MIT
 metadata:
   version: 1.0.0
