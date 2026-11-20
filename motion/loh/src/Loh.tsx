@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame} from 'remotion';
 import {CameraMotionBlur} from '@remotion/motion-blur';
 import {Bg} from './fx';
-import {CfgCtx, S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo} from './scenes';
+import {CfgCtx, YA_MAX, S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo} from './scenes';
 import {H, Offset, W, applyColors, loadFonts, panEase, sec} from './theme';
 import {B, CLIP, DURATION, E, VO} from './timing';
 import {Cfg} from './config';
@@ -76,6 +76,10 @@ export const Loh: React.FC<Cfg> = (cfg) => {
         ))}
         {[...E.keys, ...E.badges, E.flip, E.flip + 0.12, E.flip + 0.24].map((t, i) => (
           <Sfx key={'p' + i} at={t} src="sfx/pop.wav" vol={0.35 * sv} len={0.4} />
+        ))}
+        {/* a tick for every new «ي» */}
+        {Array.from({length: YA_MAX - 1}, (_, i) => E.stretch[0] + ((i + 0.5) / (YA_MAX - 1)) * E.stretch[1]).map((t, i) => (
+          <Sfx key={'y' + i} at={t} src="sfx/tap.wav" vol={0.35 * sv} len={0.15} />
         ))}
         {[E.tapAccount, E.tapJoin, E.tapSend].map((t) => (
           <Sfx key={'t' + t} at={t} src="sfx/tap.wav" vol={0.5 * sv} len={0.2} />

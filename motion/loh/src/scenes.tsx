@@ -101,12 +101,22 @@ export const S3ThreeTaps: React.FC = () => {
   );
 };
 
-/* ── S4: «بتحل مشاكل كثيييرة» — problems flip to solved ───────────── */
+/* ── S4: «بتحل مشاكل كثيييرة» — the screen gets pulled, the «ي» multiplies, then it snaps back ── */
+export const YA_MAX = 9;
 export const S4Problems: React.FC = () => {
   const t = useT();
   const c = useCfg();
-  const stretch = p(t, E.stretch[0], E.stretch[1], easeInOut);
-  const tatweel = 'ـ'.repeat(Math.round(stretch * 9));
+  const [s0, sd] = E.stretch;
+  const stretch = p(t, s0, sd, easeInOut);
+  const n = 1 + Math.round(stretch * (YA_MAX - 1)); // ي → ييييييييي
+  // screen pull: grows with the voice, then an elastic snap-back
+  const rel = t - (s0 + sd);
+  const pull = rel < 0 ? stretch : Math.exp(-5.5 * rel) * Math.cos(16 * rel);
+  const sx = 1 + 0.22 * pull;
+  const sy = 1 - 0.07 * pull;
+  // per-letter pop on the newest «ي»
+  const lastAdd = s0 + ((n - 1) / (YA_MAX - 1)) * sd;
+  const pop = n > 1 && t < s0 + sd + 0.2 ? 1 + 0.08 * (1 - p(t, lastAdd, 0.12)) : 1;
   const badges = [
     {x: 150, y: 330, s: 170},
     {x: 790, y: 270, s: 200},
@@ -114,36 +124,50 @@ export const S4Problems: React.FC = () => {
     {x: 800, y: 1380, s: 170},
     {x: 470, y: 1500, s: 140},
   ];
+  const word = `${c.bigWordStart}${c.bigWordLetter.repeat(n)}${c.bigWordEnd}`;
+  const box = (ghost = 0) => (
+    <div
+      dir="rtl"
+      style={{
+        fontFamily: F.head,
+        fontWeight: 900,
+        fontSize: 150,
+        color: C.yellow,
+        background: C.brown,
+        padding: '0 36px 10px',
+        borderRadius: 28,
+        boxShadow: ghost ? undefined : '0 24px 40px rgba(73,57,41,.35)',
+        whiteSpace: 'nowrap',
+        opacity: ghost ? 0.18 * ghost : 1,
+      }}
+    >
+      {word}
+    </div>
+  );
+  const pulling = Math.max(0, Math.abs(pull));
   return (
     <Live t={t} t0={12.1} t1={15.9}>
-      {badges.map((b, i) => (
-        <div key={i} style={{position: 'absolute', left: b.x, top: b.y + Math.sin(t * 1.8 + i) * 10}}>
-          <FlipBadge3D size={b.s} k={p(t, E.badges[i], 0.7, backOut)} flip={p(t, E.flip + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
-        </div>
-      ))}
-      <Center y={700}>
-        <Words text={c.problems} at={E.problems} stagger={0.16} size={120} />
-      </Center>
-      <Center y={880}>
-        <div
-          dir="rtl"
-          style={{
-            fontFamily: F.head,
-            fontWeight: 900,
-            fontSize: 150,
-            color: C.yellow,
-            background: C.brown,
-            padding: '0 36px 10px',
-            borderRadius: 28,
-            transform: `scale(${0.6 + 0.4 * p(t, E.bigWord, 0.7, backOut)})`,
-            opacity: p(t, E.bigWord, 0.35),
-            boxShadow: '0 24px 40px rgba(73,57,41,.35)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {`${c.bigWordStart}${tatweel}${c.bigWordEnd}`}
-        </div>
-      </Center>
+      <AbsoluteFill style={{transform: `scale(${sx}, ${sy})`, transformOrigin: '50% 48%'}}>
+        {badges.map((b, i) => (
+          <div key={i} style={{position: 'absolute', left: b.x - (sx - 1) * (540 - b.x) * 0.6, top: b.y + Math.sin(t * 1.8 + i) * 10}}>
+            <FlipBadge3D size={b.s} k={p(t, E.badges[i], 0.7, backOut)} flip={p(t, E.flip + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
+          </div>
+        ))}
+        <Center y={700}>
+          <Words text={c.problems} at={E.problems} stagger={0.16} size={120} />
+        </Center>
+        <Center y={880}>
+          <div style={{position: 'relative', transform: `scale(${(0.6 + 0.4 * p(t, E.bigWord, 0.7, backOut)) * pop})`, opacity: p(t, E.bigWord, 0.35)}}>
+            {/* rubber-band echoes while the word is being pulled */}
+            {[1, 2, 3].map((g) => (
+              <div key={g} style={{position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center', transform: `translateX(${g * 26 * pulling}px)`, filter: 'blur(4px)'}}>
+                {box(pulling * (1 - g * 0.25))}
+              </div>
+            ))}
+            <div style={{position: 'relative'}}>{box()}</div>
+          </div>
+        </Center>
+      </AbsoluteFill>
     </Live>
   );
 };

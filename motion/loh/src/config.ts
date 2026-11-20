@@ -18,6 +18,7 @@ export const schema = z.object({
 
   problems: z.string().describe('المشهد 4: النص'),
   bigWordStart: z.string().describe('المشهد 4: بداية الكلمة الممطوطة'),
+  bigWordLetter: z.string().describe('المشهد 4: الحرف اللي يتكرر'),
   bigWordEnd: z.string().describe('المشهد 4: نهاية الكلمة الممطوطة'),
 
   captions: z
@@ -51,7 +52,8 @@ export const defaults: Cfg = {
   line1Highlight: 'عندنا!',
   line2: 'بثلاث ضغطات بس',
   problems: 'بتحل مشاكل',
-  bigWordStart: 'كثيـ',
+  bigWordStart: 'كث',
+  bigWordLetter: 'ي',
   bigWordEnd: 'رة',
   captions: [
     {text: 'من واجهة التطبيق', highlight: ''},
