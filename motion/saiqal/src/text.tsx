@@ -1,6 +1,5 @@
 import React from 'react';
-import {useCurrentFrame} from 'remotion';
-import {C, F, prog} from './theme';
+import {C, F, prog, useT} from './theme';
 
 /**
  * RTL word-by-word reveal. Each whole word is wiped in from its right edge
@@ -19,8 +18,8 @@ export const Words: React.FC<{
   highlight?: string[]; // words drawn with a gold sweep
   hlStart?: number;
   style?: React.CSSProperties;
-}> = ({text, start, stagger = 5, dur = 16, size, font = F.head, weight = 700, color = C.cream, highlight = [], hlStart, style}) => {
-  const f = useCurrentFrame();
+}> = ({text, start, stagger = 6, dur = 20, size, font = F.head, weight = 700, color = C.cream, highlight = [], hlStart, style}) => {
+  const f = useT();
   const words = text.split(' ');
   return (
     <div

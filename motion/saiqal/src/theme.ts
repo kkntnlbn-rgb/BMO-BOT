@@ -1,9 +1,23 @@
-import {Easing, interpolate, staticFile} from 'remotion';
+import {Easing, interpolate, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {loadFont} from '@remotion/fonts';
 
 export const W = 1080;
 export const H = 1920;
-export const FPS = 30;
+export const FPS = 60;
+
+/** Scene time in 30fps units (authoring grid), sub-frame precise at 60fps. */
+export const useT = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  return f / (fps / 30);
+};
+export const useDur = () => {
+  const {durationInFrames, fps} = useVideoConfig();
+  return durationInFrames / (fps / 30);
+};
+
+/** Entrances are stretched for a weighted, unhurried feel. */
+export const SLOW = 1.35;
 
 export const C = {
   bg: '#5b1e08',
@@ -37,12 +51,14 @@ export const loadFonts = () => {
 };
 
 // Expo-out for entrances, expo-in for exits (smooth-motion-pro / silky-spring-motion recipe)
-export const easeOut = Easing.bezier(0.16, 1, 0.3, 1);
+export const easeOut = Easing.bezier(0.25, 1, 0.5, 1); // quart-out: long, soft settle
 export const easeIn = Easing.bezier(0.7, 0, 0.84, 0);
 export const easeInOut = Easing.bezier(0.65, 0, 0.35, 1);
+/** Camera pan between scenes (graph-editor style: slow out, slow in). */
+export const panEase = Easing.bezier(0.76, 0, 0.24, 1);
 
 export const prog = (f: number, start: number, dur: number, easing = easeOut) =>
-  interpolate(f, [start, start + dur], [0, 1], {
+  interpolate(f, [start, start + dur * SLOW], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
     easing,

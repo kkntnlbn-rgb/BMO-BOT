@@ -1,11 +1,11 @@
 import React from 'react';
 import {AbsoluteFill, Img, random, useCurrentFrame} from 'remotion';
-import {C, prog} from './theme';
+import {C, prog, useT} from './theme';
 
 /* ---------- Background: warm maroon card + paper grain + vignette ---------- */
 export const PaperBg: React.FC = () => {
-  const f = useCurrentFrame();
-  const seed = Math.floor(f / 2) % 7; // boiling grain, 15fps
+  const f = useT();
+  const seed = Math.floor(f / 2) % 7; // grain boils at 15fps // boiling grain, 15fps
   return (
     <AbsoluteFill style={{background: `radial-gradient(120% 90% at 50% 45%, ${C.bg} 0%, #521a06 55%, ${C.bgEdge} 100%)`}}>
       <svg width="100%" height="100%" style={{position: 'absolute', mixBlendMode: 'overlay', opacity: 0.35}}>
@@ -86,7 +86,7 @@ export const Branch: React.FC<{
   flip?: boolean;
   sway?: number;
 }> = ({x, y, scale = 1, rot = 0, t, seed = 1, flip = false, sway = 0}) => {
-  const f = useCurrentFrame();
+  const f = useT();
   const P0 = [0, 0];
   const P1 = [120, -40];
   const P2 = [260, 30];
@@ -158,7 +158,7 @@ export const Branch: React.FC<{
 
 /* ---------- Rising steam ---------- */
 export const Steam: React.FC<{x: number; y: number; t: number; h?: number}> = ({x, y, t, h = 360}) => {
-  const f = useCurrentFrame();
+  const f = useT();
   const plume = (phase: number, amp: number, w: number, op: number) => {
     const pts: string[] = [];
     for (let i = 0; i <= 24; i++) {

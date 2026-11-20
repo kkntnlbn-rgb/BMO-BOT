@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Sequence, interpolate} from 'remotion';
 import {
   Arabesque,
   Bowl,
@@ -17,25 +17,15 @@ import {
   TrayScene,
 } from './elements';
 import {Words} from './text';
-import {C, F, H, W, easeIn, prog} from './theme';
+import {C, F, W, easeInOut, prog, useDur, useT} from './theme';
 
-/** Every scene: slow camera push, then a motivated exit (slide left + motion blur). */
-const Shell: React.FC<{children: React.ReactNode; exit?: 'left' | 'fade' | 'none'; push?: number}> = ({children, exit = 'left', push = 0.04}) => {
-  const f = useCurrentFrame();
-  const {durationInFrames: d} = useVideoConfig();
-  const e = prog(f, d - 10, 10, easeIn);
-  const s = 1 + push * (f / d);
-  const tx = exit === 'left' ? -e * 260 : 0;
+/** Inside every scene the camera is alive: slow push-in + gentle lateral drift. Transitions live in <Pan>. */
+const Shell: React.FC<{children: React.ReactNode; exit?: string; push?: number; drift?: number}> = ({children, push = 0.04, drift = 18}) => {
+  const f = useT();
+  const d = useDur();
+  const k = f / d;
   return (
-    <AbsoluteFill
-      style={{
-        transform: `translateX(${tx}px) scale(${s})`,
-        opacity: exit === 'none' ? 1 : 1 - e,
-        filter: exit === 'left' ? `blur(${e * 10}px)` : undefined,
-      }}
-    >
-      {children}
-    </AbsoluteFill>
+    <AbsoluteFill style={{transform: `translateX(${(k - 0.5) * drift}px) scale(${1 + push * k})`}}>{children}</AbsoluteFill>
   );
 };
 
@@ -45,7 +35,7 @@ const Center: React.FC<{y: number; children: React.ReactNode}> = ({y, children})
 
 /* S1 0.0s — "قبل لا يصير للصيقل اسم" */
 export const S1Intro: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   return (
     <Shell>
       <Center y={760}>
@@ -58,7 +48,7 @@ export const S1Intro: React.FC = () => {
 
 /* S2 2.0s — steaming bowl, "كان له طعم / ما يشبه غيره" */
 export const S2Taste: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const b = prog(f, 0, 22);
   return (
     <Shell>
@@ -81,7 +71,7 @@ export const S2Taste: React.FC = () => {
 
 /* S3 4.0s — the founder's story: torn-paper portrait, branches, star */
 export const S3Story: React.FC<{portrait?: string | null}> = ({portrait}) => {
-  const f = useCurrentFrame();
+  const f = useT();
   const p = prog(f, 0, 26);
   return (
     <Shell push={0.06}>
@@ -115,7 +105,7 @@ export const S3Story: React.FC<{portrait?: string | null}> = ({portrait}) => {
 
 /* S4 7.0s — ingredients slide in from the right with kashida label lines */
 export const S4Ingredients: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const items = [
     {label: 'الزعفران', y: 420, el: <SaffronPlate size={250} />},
     {label: 'الهيل', y: 760, el: <CardamomPlate size={250} />},
@@ -156,7 +146,7 @@ export const S4Ingredients: React.FC = () => {
 
 /* S5 8.6s — "كبرت الحكاية ... كبرت معها سمعة الصيقل" */
 export const S5Grew: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const a = prog(f, 0, 16);
   const swap = prog(f, 22, 12);
   return (
@@ -180,7 +170,7 @@ export const S5Grew: React.FC = () => {
 
 /* S6 10.2s — food photo assembled from cut-out pieces */
 export const S6Tray: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const w = 760;
   const h = 520;
   return (
@@ -201,19 +191,22 @@ export const S6Tray: React.FC = () => {
           <TrayScene w={w} h={h} />
         </CutoutReveal>
       </div>
+      <Sequence from={128}>
+        <S7Return />
+      </Sequence>
     </Shell>
   );
 };
 
 /* S7 12.0s — "يرجع لها مرة بعد مرة" (horizontal type pass) */
 export const S7Return: React.FC = () => {
-  const f = useCurrentFrame();
-  const x = interpolate(f, [0, 36], [-420, 300]);
+  const f = useT();
+  const x = interpolate(f, [0, 70], [-380, 140], {extrapolateRight: 'clamp', easing: easeInOut});
   return (
-    <Shell exit="fade">
+    <Shell drift={0}>
       <Center y={1180}>
         <div style={{transform: `translateX(${x}px)`}}>
-          <Words text="يرجع لها مرة بعد مرة" start={0} stagger={3} dur={12} size={92} />
+          <Words text="يرجع لها مرة بعد مرة" start={0} stagger={3} dur={18} size={92} />
         </div>
       </Center>
     </Shell>
@@ -222,7 +215,7 @@ export const S7Return: React.FC = () => {
 
 /* S8 13.0s — copper tools assemble from cut-outs */
 export const S8Copper: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const s = 760;
   return (
     <Shell push={0.05}>
@@ -250,7 +243,7 @@ export const S8Copper: React.FC = () => {
 
 /* S9 14.8s — photo tiles stack into a collage + tag "بقي الطعم كما هو" */
 export const S9Collage: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const tiles = [
     {x: 190, y: 560, w: 360, h: 300, r: -3, dx: -700, dy: 0, d: 0},
     {x: 520, y: 600, w: 380, h: 280, r: 2, dx: 700, dy: -100, d: 5},
@@ -314,11 +307,11 @@ export const S9Collage: React.FC = () => {
 
 /* S10 17.4s — brand lockup: crossed khanjars + calligraphic name */
 export const S10Logo: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useT();
   const k = prog(f, 0, 30);
   const name = prog(f, 14, 26);
   return (
-    <Shell exit="fade" push={0.03}>
+    <Shell push={0.03} drift={0}>
       <Star8 size={280} x={1000} y={120} t={prog(f, 6, 20)} rot={20} />
       <Star8 size={280} x={90} y={1560} t={prog(f, 54, 20)} rot={-10} />
       <div style={{position: 'absolute', left: W / 2 - 290, top: 420, transform: `rotate(-24deg)`, transformOrigin: 'center'}}>
