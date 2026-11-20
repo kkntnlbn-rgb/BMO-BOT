@@ -15,10 +15,12 @@
     "@remotion/media-utils": "^4.0.545",
     "@remotion/motion-blur": "^4.0.545",
     "@remotion/transitions": "^4.0.545",
+    "@remotion/zod-types": "^4.0.545",
     "@types/react": "^19.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remotion": "^4.0.545",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "zod": "^3.22.3"
   }
 }

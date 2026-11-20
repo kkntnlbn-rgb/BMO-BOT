@@ -228,8 +228,9 @@ export const KeyCap3D: React.FC<{size: number; icon: React.ReactNode; n: number;
 
 /* 3D coin-badge that flips from "!" (problem) to "✓" (solved) */
 export const FlipBadge3D: React.FC<{size: number; k: number; flip: number; t: number; seed: number}> = ({size, k, flip, t, seed}) => {
-  const ry = flip * 180 + Math.sin(t * 2 + seed) * 10;
-  const showBack = ((ry % 360) + 360) % 360 > 90 && ((ry % 360) + 360) % 360 < 270;
+  // turn edge-on, swap the face (! → ✓) at 90°, turn back — the lit front face always faces camera
+  const showBack = flip >= 0.5;
+  const ry = (flip < 0.5 ? flip : 1 - flip) * 180 + Math.sin(t * 2 + seed) * 10;
   return (
     <div style={{position: 'relative', width: size, height: size}}>
       <Contact x={size / 2} y={size * 1.0} w={size * 0.8} k={k} />
@@ -251,8 +252,7 @@ export const FlipBadge3D: React.FC<{size: number; k: number; flip: number; t: nu
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transform: showBack ? 'scaleX(-1)' : undefined,
-              boxShadow: side ? undefined : 'inset 0 6px 0 rgba(255,255,255,.25)',
+                            boxShadow: side ? undefined : 'inset 0 6px 0 rgba(255,255,255,.25)',
             }}
           >
             {!side &&
@@ -349,13 +349,13 @@ export const Tap: React.FC<{x: number; y: number; at: number; t: number}> = ({x,
       <div
         style={{
           position: 'absolute',
-          left: -34,
-          top: -34,
-          width: 68,
-          height: 68,
+          left: -26,
+          top: -26,
+          width: 52,
+          height: 52,
           borderRadius: '50%',
-          background: 'rgba(73,57,41,.35)',
-          border: '4px solid rgba(255,255,255,.85)',
+          background: 'rgba(255,255,255,.55)',
+          border: `5px solid ${C.brown}`,
           transform: `scale(${(0.6 + 0.4 * a) * (t > at && t < at + 0.12 ? 0.85 : 1)})`,
           opacity: a * (1 - out),
           boxShadow: '0 10px 20px rgba(0,0,0,.25)',

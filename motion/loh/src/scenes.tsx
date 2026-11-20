@@ -1,10 +1,13 @@
-import React from 'react';
+import React, {createContext, useContext} from 'react';
 import {AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile} from 'remotion';
 import {Clock3D, Contact, Extrude, FlipBadge3D, IconHome, IconJoin, IconUser, KeyCap3D, Phone, SCREEN, Tap, Words} from './fx';
-import {C, F, W, backOut, easeInOut, p, sec, useT} from './theme';
+import {C, F, Offset, W, backOut, easeInOut, p, sec, useT} from './theme';
+import {CLIP, E} from './timing';
+import {Cfg, defaults} from './config';
 
-/** Absolute timeline time (seconds) inside a scene that starts at `o`. */
-const useAbs = (_o: number) => useT();
+export const CfgCtx = createContext<Cfg>(defaults);
+const useCfg = () => useContext(CfgCtx);
+const hl = (w: string) => (w ? [w] : []);
 
 /** Camera is alive inside every scene: slow push + drift (same as Saiqal). */
 const Live: React.FC<{t: number; t0: number; t1: number; push?: number; drift?: number; children: React.ReactNode}> = ({t, t0, t1, push = 0.04, drift = 16, children}) => {
@@ -16,29 +19,31 @@ const Center: React.FC<{y: number; children: React.ReactNode}> = ({y, children})
   <div style={{position: 'absolute', left: 60, right: 60, top: y, display: 'flex', justifyContent: 'center'}}>{children}</div>
 );
 
-/* ── S1 0.0s: «تدري وش أسهل من التسجيل عالأوجي؟» ───────────────────────── */
-export const S1Hook: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
+/* ── S1: hook question ─────────────────────────────────────────────── */
+export const S1Hook: React.FC = () => {
+  const t = useT();
+  const c = useCfg();
   return (
-    <Live t={t} t0={0} t1={2.8}>
+    <Live t={t} t0={0} t1={3.3}>
       <div style={{position: 'absolute', left: 760, top: 210}}>
-        <Clock3D size={230} k={p(t, 0.5, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, 0.5, 1.4))} />
+        <Clock3D size={230} k={p(t, E.hookClock, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, E.hookClock, 1.4))} />
       </div>
       <Center y={760}>
-        <Words text={'تدري وش أسهل \n من التسجيل عالأوجي؟'} at={0.3} stagger={0.13} size={118} hl={['عالأوجي؟']} />
+        <Words text={c.hook} at={E.hook} stagger={0.14} size={118} hl={hl(c.hookHighlight)} />
       </Center>
     </Live>
   );
 };
 
-/* ── S2 2.15s: the OG reaction clip (with its own audio, added in the master) ── */
-export const S2Reaction: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
-  const k = p(t, 2.25, 0.8);
+/* ── S2: OG reaction clip (its audio is mixed in the master) ───────── */
+export const S2Reaction: React.FC = () => {
+  const t = useT();
+  const o = useContext(Offset);
+  const k = p(t, E.clipCard, 0.8);
   const w = 940;
   const h = (w * 464) / 560;
   return (
-    <Live t={t} t0={2.15} t1={7.3} push={0.05}>
+    <Live t={t} t0={2.7} t1={8.1} push={0.05}>
       <div
         style={{
           position: 'absolute',
@@ -52,41 +57,43 @@ export const S2Reaction: React.FC<{o: number}> = ({o}) => {
           boxShadow: '0 40px 70px rgba(73,57,41,.45)',
           transform: `translateY(${(1 - k) * 140}px) rotate(${(1 - k) * -5 - 1.2}deg) scale(${0.9 + 0.1 * k})`,
           opacity: Math.min(1, k * 1.6),
+          background: '#000',
         }}
       >
-        <Sequence from={sec(0.15)}>
-          <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(0.8)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+        {/* the clip holds its first frame until playback, then plays and holds its last frame */}
+        <Sequence from={0} durationInFrames={Math.max(1, sec(CLIP.at - o))}>
+          <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} endAt={sec(CLIP.from) + 1} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+        </Sequence>
+        <Sequence from={sec(CLIP.at - o)}>
+          <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
         </Sequence>
       </div>
       <div style={{position: 'absolute', left: 90, top: 400}}>
-        <Clock3D size={170} k={p(t, 2.6, 0.8, backOut)} t={t} />
+        <Clock3D size={170} k={p(t, E.clipCard + 0.3, 0.8, backOut)} t={t} />
       </div>
     </Live>
   );
 };
 
-/* ── S3 6.7s: «إنك تسجل براندك عندنا! بثلاث ضغطات بس» + 3D step keys ────── */
-export const S3ThreeTaps: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
-  const keys = [
-    {icon: <IconHome />, at: 9.05},
-    {icon: <IconUser />, at: 9.4},
-    {icon: <IconJoin />, at: 9.75},
-  ];
+/* ── S3: «إنك تسجل براندك عندنا! بثلاث ضغطات بس» + 3D step keys ───── */
+export const S3ThreeTaps: React.FC = () => {
+  const t = useT();
+  const c = useCfg();
+  const icons = [<IconHome key="h" />, <IconUser key="u" />, <IconJoin key="j" />];
   const size = 270;
   return (
-    <Live t={t} t0={6.7} t1={11.0}>
+    <Live t={t} t0={7.5} t1={12.7}>
       <Center y={380}>
-        <Words text={'إنك تسجل براندك \n عندنا!'} at={7.15} stagger={0.14} size={110} hl={['عندنا!']} />
+        <Words text={c.line1} at={E.line1} stagger={0.16} size={110} hl={hl(c.line1Highlight)} />
       </Center>
       <Center y={760}>
-        <Words text="بثلاث ضغطات بس" at={8.85} stagger={0.14} size={92} color={C.brownSoft} />
+        <Words text={c.line2} at={E.line2} stagger={0.15} size={92} color={C.brownSoft} />
       </Center>
-      {keys.map((kk, i) => {
+      {icons.map((icon, i) => {
         const x = W / 2 + (1 - i) * 330 - size / 2; // RTL: step 1 on the right
         return (
-          <div key={i} style={{position: 'absolute', left: x, top: 1040 + Math.sin(t * 2 + i) * 8}}>
-            <KeyCap3D size={size} icon={kk.icon} n={i + 1} k={p(t, kk.at, 0.7, backOut)} t={t} seed={i} />
+          <div key={i} style={{position: 'absolute', left: x, top: 1060 + Math.sin(t * 2 + i) * 8}}>
+            <KeyCap3D size={size} icon={icon} n={i + 1} k={p(t, E.keys[i], 0.8, backOut)} t={t} seed={i} />
           </div>
         );
       })}
@@ -94,27 +101,28 @@ export const S3ThreeTaps: React.FC<{o: number}> = ({o}) => {
   );
 };
 
-/* ── S4 10.45s: «بتحل مشاكل كثيييييرة» — problems flip to solved ─────────── */
-export const S4Problems: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
-  const stretch = p(t, 11.95, 0.85, easeInOut); // follows the voice's long «كثيييرة»
+/* ── S4: «بتحل مشاكل كثيييرة» — problems flip to solved ───────────── */
+export const S4Problems: React.FC = () => {
+  const t = useT();
+  const c = useCfg();
+  const stretch = p(t, E.stretch[0], E.stretch[1], easeInOut);
   const tatweel = 'ـ'.repeat(Math.round(stretch * 9));
   const badges = [
-    {x: 150, y: 330, s: 170, a: 10.9},
-    {x: 790, y: 270, s: 200, a: 11.05},
-    {x: 110, y: 1330, s: 210, a: 11.2},
-    {x: 800, y: 1380, s: 170, a: 11.35},
-    {x: 470, y: 1500, s: 140, a: 11.5},
+    {x: 150, y: 330, s: 170},
+    {x: 790, y: 270, s: 200},
+    {x: 110, y: 1330, s: 210},
+    {x: 800, y: 1380, s: 170},
+    {x: 470, y: 1500, s: 140},
   ];
   return (
-    <Live t={t} t0={10.45} t1={13.2}>
+    <Live t={t} t0={12.1} t1={15.9}>
       {badges.map((b, i) => (
         <div key={i} style={{position: 'absolute', left: b.x, top: b.y + Math.sin(t * 1.8 + i) * 10}}>
-          <FlipBadge3D size={b.s} k={p(t, b.a, 0.6, backOut)} flip={p(t, 12.0 + i * 0.1, 0.6, easeInOut)} t={t} seed={i} />
+          <FlipBadge3D size={b.s} k={p(t, E.badges[i], 0.7, backOut)} flip={p(t, E.flip + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
         </div>
       ))}
       <Center y={700}>
-        <Words text="بتحل مشاكل" at={10.9} stagger={0.15} size={120} />
+        <Words text={c.problems} at={E.problems} stagger={0.16} size={120} />
       </Center>
       <Center y={880}>
         <div
@@ -127,33 +135,33 @@ export const S4Problems: React.FC<{o: number}> = ({o}) => {
             background: C.brown,
             padding: '0 36px 10px',
             borderRadius: 28,
-            transform: `scale(${0.6 + 0.4 * p(t, 11.45, 0.6, backOut)})`,
-            opacity: p(t, 11.45, 0.3),
+            transform: `scale(${0.6 + 0.4 * p(t, E.bigWord, 0.7, backOut)})`,
+            opacity: p(t, E.bigWord, 0.35),
             boxShadow: '0 24px 40px rgba(73,57,41,.35)',
             whiteSpace: 'nowrap',
           }}
         >
-          {`كثيـ${tatweel}رة`}
+          {`${c.bigWordStart}${tatweel}${c.bigWordEnd}`}
         </div>
       </Center>
     </Live>
   );
 };
 
-/* ── S5 12.6s: the three taps, shown on the real app ──────────────────────── */
-const PW = 600; // phone width
+/* ── S5: the three taps on the real app ────────────────────────────── */
+const PW = 600;
 const SW = PW - 28;
-const SC = SW / SCREEN.w; // screenshot px → on-screen px
+const SC = SW / SCREEN.w;
 const sx = (x: number) => 14 + x * SC;
 const sy = (y: number) => 14 + y * SC;
 
-const Caption: React.FC<{t: number; text: string; at: number; until: number; hl?: string[]}> = ({t, text, at, until, hl}) => {
+const Caption: React.FC<{t: number; text: string; at: number; until: number; hl: string[]}> = ({t, text, at, until, hl: h}) => {
   if (t < at - 0.1 || t > until + 0.5) return null;
-  const out = p(t, until, 0.35, easeInOut);
+  const out = p(t, until, 0.4, easeInOut);
   return (
     <div style={{position: 'absolute', left: 0, right: 0, top: 250, transform: `translateY(${-out * 60}px)`, opacity: 1 - out, filter: `blur(${out * 6}px)`}}>
       <Center y={0}>
-        <Words text={text} at={at} stagger={0.12} size={100} hl={hl} />
+        <Words text={text} at={at} stagger={0.13} size={100} hl={h} />
       </Center>
     </div>
   );
@@ -161,31 +169,30 @@ const Caption: React.FC<{t: number; text: string; at: number; until: number; hl?
 
 const typed = (t: number, at: number, s: string, cps = 18) => s.slice(0, Math.max(0, Math.floor((t - at) * cps)));
 
-export const S5App: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
-  const enter = p(t, 12.65, 1.0);
-  // screen pushes (RTL apps push in from the left)
-  const toAcc = p(t, 15.0, 0.5, easeInOut);
-  const toJoin = p(t, 16.6, 0.5, easeInOut);
+export const S5App: React.FC = () => {
+  const t = useT();
+  const c = useCfg();
+  const enter = p(t, E.phoneIn, 1.1);
+  const toAcc = p(t, E.toAccount, 0.55, easeInOut);
+  const toJoin = p(t, E.toJoin, 0.55, easeInOut);
   const screens = [
     {src: 'media/screen-home.png', x: toAcc * 0.35},
     {src: 'media/screen-account.png', x: -1 + toAcc + toJoin * 0.35},
     {src: 'media/screen-join.png', x: -1 + toJoin},
   ];
-  // camera focus keyframes (screenshot coords) + zoom
+  // camera focus keyframes: time, focus x/y (screenshot px), zoom
   const kf: [number, number, number, number][] = [
-    // time, fx, fy, zoom
-    [13.0, 460, 1000, 1.0],
-    [14.4, 460, 1000, 1.0],
-    [14.9, 300, 1600, 1.12],
-    [15.3, 460, 1000, 1.0],
-    [16.0, 460, 1300, 1.1],
-    [16.9, 460, 1000, 1.0],
-    [17.4, 460, 1000, 1.0],
-    [17.9, 460, 1000, 1.14],
-    [19.0, 460, 1250, 1.14],
-    [19.5, 460, 1300, 1.1],
-    [20.1, 460, 1000, 1.0],
+    [16.0, 460, 1000, 1.0],
+    [E.tapAccount - 0.7, 460, 1000, 1.0],
+    [E.tapAccount, 300, 1600, 1.12],
+    [E.toAccount + 0.6, 460, 1000, 1.0],
+    [E.tapJoin, 460, 1300, 1.1],
+    [E.toJoin + 0.6, 460, 1000, 1.0],
+    [E.fields[0] - 0.2, 460, 1000, 1.0],
+    [E.fields[0] + 0.4, 460, 1000, 1.14],
+    [E.tapSend - 0.5, 460, 1250, 1.14],
+    [E.tapSend, 460, 1300, 1.1],
+    [E.sent + 1.0, 460, 1000, 1.0],
   ];
   const ts = kf.map((k) => k[0]);
   const ip = (i: number) => interpolate(t, ts, kf.map((k) => k[i]), {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeInOut});
@@ -197,20 +204,18 @@ export const S5App: React.FC<{o: number}> = ({o}) => {
   const camY = (phoneH / 2 - sy(fy)) * (z - 1) * 1.6;
 
   const fields = [
-    {y: 695, v: 'براند الريم', at: 17.55},
-    {y: 905, v: 'عبدالله محمد', at: 17.9},
-    {y: 1115, v: '0555 123 456', at: 18.25},
-    {y: 1325, v: 'hello@brand.sa', at: 18.6},
+    {y: 695, v: c.formCompany},
+    {y: 905, v: c.formPerson},
+    {y: 1115, v: c.formPhone},
+    {y: 1325, v: c.formEmail},
   ];
-  const sent = p(t, 19.55, 0.5, backOut);
+  const sent = p(t, E.sent, 0.6, backOut);
 
   return (
     <AbsoluteFill>
-      <Caption t={t} text="من واجهة التطبيق" at={13.0} until={14.5} />
-      <Caption t={t} text="تروح لـ حسابي" at={14.6} until={15.8} hl={['حسابي']} />
-      <Caption t={t} text="ثم انضم لنا" at={15.9} until={17.3} hl={['انضم']} />
-      <Caption t={t} text="وتعبي بيانات براندك" at={17.45} until={18.95} hl={['براندك']} />
-      <Caption t={t} text="وتضغط إرسال" at={19.05} until={21} hl={['إرسال']} />
+      {c.captions.map((cap, i) => (
+        <Caption key={i} t={t} text={cap.text} at={E.captions[i][0]} until={E.captions[i][1]} hl={hl(cap.highlight)} />
+      ))}
 
       <div style={{position: 'absolute', left: (W - PW) / 2, top: 560, perspective: 1600}}>
         <Contact x={PW / 2} y={phoneH * 0.86 + 230} w={PW * 0.9} k={enter * 0.8} />
@@ -222,9 +227,8 @@ export const S5App: React.FC<{o: number}> = ({o}) => {
           }}
         >
           <Phone w={PW} screens={screens}>
-            {/* typing into the join form */}
             {fields.map((f, i) => {
-              const v = typed(t, f.at, f.v);
+              const v = typed(t, E.fields[i], f.v);
               if (!v) return null;
               return (
                 <div
@@ -252,34 +256,32 @@ export const S5App: React.FC<{o: number}> = ({o}) => {
                 </div>
               );
             })}
-            {/* sent: dim + 3D badge */}
-            {t > 19.5 && (
+            {t > E.sent - 0.05 && (
               <AbsoluteFill style={{background: `rgba(73,57,41,${0.55 * Math.min(1, sent)})`, alignItems: 'center', justifyContent: 'center'}}>
                 <div style={{position: 'relative', width: 220, height: 220}}>
                   <FlipBadge3D size={220} k={sent} flip={1} t={t} seed={3} />
                 </div>
-                <div style={{fontFamily: F.head, fontWeight: 900, fontSize: 64, color: C.yellow, marginTop: 40, opacity: p(t, 19.75, 0.4)}}>تم الإرسال</div>
+                <div style={{fontFamily: F.head, fontWeight: 900, fontSize: 64, color: C.yellow, marginTop: 40, opacity: p(t, E.sent + 0.2, 0.4)}}>{c.sentText}</div>
               </AbsoluteFill>
             )}
           </Phone>
-          {/* taps (phone coordinates) */}
-          <Tap x={sx(170)} y={sy(1880)} at={14.85} t={t} />
-          <Tap x={sx(460)} y={sy(1555)} at={16.45} t={t} />
-          <Tap x={sx(460)} y={sy(1537)} at={19.4} t={t} />
+          <Tap x={sx(170)} y={sy(1880)} at={E.tapAccount} t={t} />
+          <Tap x={sx(460)} y={sy(1555)} at={E.tapJoin} t={t} />
+          <Tap x={sx(460)} y={sy(1537)} at={E.tapSend} t={t} />
         </div>
       </div>
     </AbsoluteFill>
   );
 };
 
-/* ── S6 19.9s: LOH lockup — extruded 3D logo, clock hands spin and land as a check ── */
-export const S6Logo: React.FC<{o: number}> = ({o}) => {
-  const t = useAbs(o);
-  const k = p(t, 20.2, 1.0);
-  const spin = interpolate(p(t, 20.3, 1.5, easeInOut), [0, 1], [-720, 0]);
-  const LW = 980; // rendered logo image width (source 970×894)
-  const s = LW / 970;
-  const LH = 894 * s;
+/* ── S6: extruded 3D LOH logo; clock hands spin and land as a check ── */
+export const S6Logo: React.FC = () => {
+  const t = useT();
+  const c = useCfg();
+  const k = p(t, E.logo, 1.1);
+  const spin = interpolate(p(t, E.logoSpin[0], E.logoSpin[1], easeInOut), [0, 1], [-720, 0]);
+  const LW = 980;
+  const LH = (894 * LW) / 970;
   const logo = (side: boolean) => (
     <div style={{position: 'relative', width: LW, height: LH}}>
       <Img src={staticFile('media/logo-nohands.png')} style={{width: LW, height: LH, filter: side ? 'brightness(.55)' : undefined}} />
@@ -292,7 +294,7 @@ export const S6Logo: React.FC<{o: number}> = ({o}) => {
     </div>
   );
   return (
-    <Live t={t} t0={19.9} t1={24} push={0.03} drift={0}>
+    <Live t={t} t0={24.7} t1={30} push={0.03} drift={0}>
       <div style={{position: 'absolute', left: (W - LW) / 2, top: 420, width: LW, height: LH, clipPath: `inset(0 ${(1 - k) * 100}% 0 0)`}}>
         <Extrude
           w={LW}
@@ -305,7 +307,7 @@ export const S6Logo: React.FC<{o: number}> = ({o}) => {
         />
       </div>
       <Center y={1240}>
-        <Words text="سجّل براندك بثلاث ضغطات" at={21.0} stagger={0.12} size={84} hl={['بثلاث']} />
+        <Words text={c.tagline} at={E.tagline} stagger={0.13} size={84} hl={hl(c.taglineHighlight)} />
       </Center>
     </Live>
   );

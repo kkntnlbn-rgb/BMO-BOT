@@ -28,6 +28,24 @@ export const C = {
   white: '#ffffff',
 };
 
+/** Mix two hex colors (t=0 → a, t=1 → b) */
+const mix = (a: string, b: string, t: number) => {
+  const h = (x: string) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16));
+  const A = h(a);
+  const Bc = h(b);
+  return '#' + A.map((v, i) => Math.round(v + (Bc[i] - v) * t).toString(16).padStart(2, '0')).join('');
+};
+
+/** Re-derive the palette from the two brand colors chosen in the control panel. */
+export const applyColors = (yellow: string, brown: string) => {
+  C.yellow = yellow;
+  C.brown = brown;
+  C.yellowDeep = mix(yellow, '#b07800', 0.25);
+  C.yellowLight = mix(yellow, '#ffffff', 0.3);
+  C.brownSoft = mix(brown, yellow, 0.18);
+  C.cream = mix(yellow, '#ffffff', 0.85);
+};
+
 export const F = {
   head: 'Thmanyah Serif',
   ui: 'Tajawal',
