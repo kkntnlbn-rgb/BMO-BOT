@@ -2,7 +2,7 @@ import React, {createContext, useContext} from 'react';
 import {AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile} from 'remotion';
 import {Clock3D, Contact, Extrude, FlipBadge3D, IconHome, IconJoin, IconUser, KeyCap3D, Phone, SCREEN, Tap, Words} from './fx';
 import {C, F, Offset, W, backOut, easeInOut, p, sec, useT} from './theme';
-import {CLIP, E} from './timing';
+import {CLIP, CLIP2, E} from './timing';
 import {Cfg, defaults} from './config';
 
 export const CfgCtx = createContext<Cfg>(defaults);
@@ -24,7 +24,7 @@ export const S1Hook: React.FC = () => {
   const t = useT();
   const c = useCfg();
   return (
-    <Live t={t} t0={0} t1={3.3}>
+    <Live t={t} t0={0} t1={3.1}>
       <div style={{position: 'absolute', left: 760, top: 210}}>
         <Clock3D size={230} k={p(t, E.hookClock, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, E.hookClock, 1.4))} />
       </div>
@@ -43,7 +43,7 @@ export const S2Reaction: React.FC = () => {
   const w = 940;
   const h = (w * 464) / 560;
   return (
-    <Live t={t} t0={2.7} t1={8.1} push={0.05}>
+    <Live t={t} t0={2.5} t1={7.7} push={0.05}>
       <div
         style={{
           position: 'absolute',
@@ -82,7 +82,7 @@ export const S3ThreeTaps: React.FC = () => {
   const icons = [<IconHome key="h" />, <IconUser key="u" />, <IconJoin key="j" />];
   const size = 270;
   return (
-    <Live t={t} t0={7.5} t1={12.7}>
+    <Live t={t} t0={7.0} t1={11.6}>
       <Center y={380}>
         <Words text={c.line1} at={E.line1} stagger={0.16} size={110} hl={hl(c.line1Highlight)} />
       </Center>
@@ -118,12 +118,16 @@ export const S4Problems: React.FC = () => {
   const lastAdd = s0 + ((n - 1) / (YA_MAX - 1)) * sd;
   const pop = n > 1 && t < s0 + sd + 0.2 ? 1 + 0.08 * (1 - p(t, lastAdd, 0.12)) : 1;
   const badges = [
-    {x: 150, y: 330, s: 170},
-    {x: 790, y: 270, s: 200},
-    {x: 110, y: 1330, s: 210},
-    {x: 800, y: 1380, s: 170},
-    {x: 470, y: 1500, s: 140},
+    {x: 40, y: 1430, s: 180},
+    {x: 850, y: 1470, s: 190},
+    {x: 470, y: 1640, s: 140},
+    {x: 20, y: 170, s: 150},
+    {x: 900, y: 150, s: 150},
   ];
+  const o = useContext(Offset);
+  const ck = p(t, E.clip2Card, 0.8);
+  const cw = 860;
+  const ch = (cw * 328) / 480;
   const word = `${c.bigWordStart}${c.bigWordLetter.repeat(n)}${c.bigWordEnd}`;
   const box = (ghost = 0) => (
     <div
@@ -146,17 +150,41 @@ export const S4Problems: React.FC = () => {
   );
   const pulling = Math.max(0, Math.abs(pull));
   return (
-    <Live t={t} t0={12.1} t1={15.9}>
+    <Live t={t} t0={10.9} t1={15.3}>
       <AbsoluteFill style={{transform: `scale(${sx}, ${sy})`, transformOrigin: '50% 48%'}}>
+        {/* reaction #2 — the "problems" */}
+        <div
+          style={{
+            position: 'absolute',
+            left: (W - cw) / 2,
+            top: 270,
+            width: cw,
+            height: ch,
+            borderRadius: 44,
+            overflow: 'hidden',
+            border: `12px solid ${C.brown}`,
+            background: '#000',
+            boxShadow: '0 40px 70px rgba(73,57,41,.45)',
+            transform: `translateY(${(1 - ck) * -120}px) rotate(${(1 - ck) * 5 + 1.5}deg) scale(${0.9 + 0.1 * ck})`,
+            opacity: Math.min(1, ck * 1.6),
+          }}
+        >
+          <Sequence from={0} durationInFrames={Math.max(1, sec(CLIP2.at - o))}>
+            <OffthreadVideo src={staticFile('media/reaction2.mp4')} startFrom={sec(CLIP2.from)} endAt={sec(CLIP2.from) + 1} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+          </Sequence>
+          <Sequence from={sec(CLIP2.at - o)}>
+            <OffthreadVideo src={staticFile('media/reaction2.mp4')} startFrom={sec(CLIP2.from)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+          </Sequence>
+        </div>
         {badges.map((b, i) => (
           <div key={i} style={{position: 'absolute', left: b.x - (sx - 1) * (540 - b.x) * 0.6, top: b.y + Math.sin(t * 1.8 + i) * 10}}>
             <FlipBadge3D size={b.s} k={p(t, E.badges[i], 0.7, backOut)} flip={p(t, E.flip + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
           </div>
         ))}
-        <Center y={700}>
+        <Center y={1000}>
           <Words text={c.problems} at={E.problems} stagger={0.16} size={120} />
         </Center>
-        <Center y={880}>
+        <Center y={1170}>
           <div style={{position: 'relative', transform: `scale(${(0.6 + 0.4 * p(t, E.bigWord, 0.7, backOut)) * pop})`, opacity: p(t, E.bigWord, 0.35)}}>
             {/* rubber-band echoes while the word is being pulled */}
             {[1, 2, 3].map((g) => (
@@ -191,12 +219,12 @@ const Caption: React.FC<{t: number; text: string; at: number; until: number; hl:
   );
 };
 
-const typed = (t: number, at: number, s: string, cps = 18) => s.slice(0, Math.max(0, Math.floor((t - at) * cps)));
+const typed = (t: number, at: number, s: string, cps = 24) => s.slice(0, Math.max(0, Math.floor((t - at) * cps)));
 
 export const S5App: React.FC = () => {
   const t = useT();
   const c = useCfg();
-  const enter = p(t, E.phoneIn, 1.1);
+  const enter = p(t, E.phoneIn, 0.95);
   const toAcc = p(t, E.toAccount, 0.55, easeInOut);
   const toJoin = p(t, E.toJoin, 0.55, easeInOut);
   const screens = [
@@ -206,17 +234,17 @@ export const S5App: React.FC = () => {
   ];
   // camera focus keyframes: time, focus x/y (screenshot px), zoom
   const kf: [number, number, number, number][] = [
-    [16.0, 460, 1000, 1.0],
-    [E.tapAccount - 0.7, 460, 1000, 1.0],
+    [E.phoneIn + 0.6, 460, 1000, 1.0],
+    [E.tapAccount - 0.6, 460, 1000, 1.0],
     [E.tapAccount, 300, 1600, 1.12],
-    [E.toAccount + 0.6, 460, 1000, 1.0],
+    [E.toAccount + 0.4, 460, 1000, 1.0],
     [E.tapJoin, 460, 1300, 1.1],
-    [E.toJoin + 0.6, 460, 1000, 1.0],
-    [E.fields[0] - 0.2, 460, 1000, 1.0],
-    [E.fields[0] + 0.4, 460, 1000, 1.14],
+    [E.toJoin + 0.3, 460, 1000, 1.0],
+    [E.fields[0] + 0.05, 460, 1000, 1.0],
+    [E.fields[0] + 0.45, 460, 1000, 1.14],
     [E.tapSend - 0.5, 460, 1250, 1.14],
     [E.tapSend, 460, 1300, 1.1],
-    [E.sent + 1.0, 460, 1000, 1.0],
+    [E.sent + 0.8, 460, 1000, 1.0],
   ];
   const ts = kf.map((k) => k[0]);
   const ip = (i: number) => interpolate(t, ts, kf.map((k) => k[i]), {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeInOut});
@@ -318,7 +346,7 @@ export const S6Logo: React.FC = () => {
     </div>
   );
   return (
-    <Live t={t} t0={24.7} t1={30} push={0.03} drift={0}>
+    <Live t={t} t0={22.2} t1={24.8} push={0.03} drift={0}>
       <div style={{position: 'absolute', left: (W - LW) / 2, top: 420, width: LW, height: LH, clipPath: `inset(0 ${(1 - k) * 100}% 0 0)`}}>
         <Extrude
           w={LW}
