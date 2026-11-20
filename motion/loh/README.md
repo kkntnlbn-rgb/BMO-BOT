@@ -1,6 +1,6 @@
 # LOH — "سجّل براندك بثلاث ضغطات" (Remotion)
 
-9:16, 1080×1920, 60fps, **22.0s (1320 frames)**. Same motion language as `../saiqal` (camera-pan hand-offs,
+9:16, 1080×1920, 60fps, **21.0s (1260 frames)**. Same motion language as `../saiqal` (camera-pan hand-offs,
 motion blur, weighted quart-out entrances, live camera drift), re-skinned to the LOH identity:
 yellow `#f3c32c`, brown `#493929`, Thmanyah Serif Black.
 
@@ -24,11 +24,10 @@ placement `VO`, the OG clip `CLIP`, and every visual cue `E`. Defaults: `src/con
 ## Beats (locked to the voice-over in public/media/vo.mp3)
 | Time | Visual | VO |
 |---|---|---|
-| 0.0 | Hook text + 3D clock motif | تدري وش أسهل من التسجيل عالأوجي؟ |
-| 2.8 | OG reaction clip (own audio) | — |
-| 7.35 | Text + three 3D step keys | إنك تسجل براندك عندنا! بثلاث ضغطات بس |
-| 11.3 | Frustrated-typing reaction + 3D "!" coins → ✓, «كثيييرة» stretch | بتحل مشاكل كثيييرة |
-| 15.0 | 3D phone, real app: home → حسابي → انضم لنا → typing → إرسال | من واجهة التطبيق … وتضغط إرسال |
-| 22.5 | Extruded 3D LOH logo, clock hands land as a check + tagline | — |
+| 0.0 | Hook text; the OG reaction drops in over it (light tint behind), his voice right after the question | تدري وش أسهل من التسجيل عالأوجي؟ |
+| 4.7 | Text + three 3D step keys | إنك تسجل براندك عندنا! بثلاث ضغطات بس |
+| 8.5 | Muted frustrated-typing reaction + 3D "!" coins → ✓, «كثيييرة» stretch | بتحل مشاكل كثيييرة |
+| 11.5 | 3D phone, real app: home → حسابي → انضم لنا → typing → إرسال | من واجهة التطبيق … وتضغط إرسال |
+| 18.8 | Extruded 3D LOH logo, clock hands land as a check + tagline | — |
 
 

@@ -19,57 +19,51 @@ const Center: React.FC<{y: number; children: React.ReactNode}> = ({y, children})
   <div style={{position: 'absolute', left: 60, right: 60, top: y, display: 'flex', justifyContent: 'center'}}>{children}</div>
 );
 
-/* ── S1: hook question ─────────────────────────────────────────────── */
+/* ── S1: hook question — the OG reaction drops in over it (no cut), with a light tint behind ── */
 export const S1Hook: React.FC = () => {
   const t = useT();
   const c = useCfg();
-  return (
-    <Live t={t} t0={0} t1={2.9}>
-      <div style={{position: 'absolute', left: 760, top: 210}}>
-        <Clock3D size={230} k={p(t, E.hookClock, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, E.hookClock, 1.4))} />
-      </div>
-      <Center y={760}>
-        <Words text={c.hook} at={E.hook} stagger={0.14} size={118} hl={hl(c.hookHighlight)} />
-      </Center>
-    </Live>
-  );
-};
-
-/* ── S2: OG reaction clip (its audio is mixed in the master) ───────── */
-export const S2Reaction: React.FC = () => {
-  const t = useT();
   const o = useContext(Offset);
-  const k = p(t, E.clipCard, 0.8);
-  const w = 940;
+  const k = p(t, E.clipCard, 0.75, backOut);
+  const tint = p(t, E.clipCard, 0.6);
+  const lift = p(t, E.clipCard - 0.1, 0.7, easeInOut);
+  const w = 900;
   const h = (w * 464) / 560;
   return (
-    <Live t={t} t0={2.3} t1={6.4} push={0.05}>
+    <Live t={t} t0={0} t1={5.0}>
+      <div style={{position: 'absolute', left: 760, top: 210, opacity: 1 - tint}}>
+        <Clock3D size={230} k={p(t, E.hookClock, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, E.hookClock, 1.4))} />
+      </div>
+      {/* light tint over everything behind the clip */}
+      <AbsoluteFill style={{background: C.brown, opacity: 0.26 * tint}} />
+      {/* the question rises to make room, so it stays readable above the clip */}
+      <div style={{position: 'absolute', inset: 0, transform: `translateY(${-560 * lift}px) scale(${1 - 0.12 * lift})`, transformOrigin: '50% 40%'}}>
+        <Center y={760}>
+          <Words text={c.hook} at={E.hook} stagger={0.12} size={118} hl={hl(c.hookHighlight)} />
+        </Center>
+      </div>
       <div
         style={{
           position: 'absolute',
           left: (W - w) / 2,
-          top: 520,
+          top: 760,
           width: w,
           height: h,
           borderRadius: 48,
           overflow: 'hidden',
-          border: `12px solid ${C.brown}`,
-          boxShadow: '0 40px 70px rgba(73,57,41,.45)',
-          transform: `translateY(${(1 - k) * 140}px) rotate(${(1 - k) * -5 - 1.2}deg) scale(${0.9 + 0.1 * k})`,
-          opacity: Math.min(1, k * 1.6),
+          border: `12px solid ${C.yellow}`,
           background: '#000',
+          boxShadow: '0 50px 90px rgba(20,12,4,.55)',
+          transform: `translateY(${(1 - k) * -1500}px) rotate(${(1 - k) * 8 - 1.5}deg)`,
+          opacity: t < E.clipCard ? 0 : 1,
         }}
       >
-        {/* the clip holds its first frame until playback, then plays and holds its last frame */}
-        <Sequence from={0} durationInFrames={Math.max(1, sec(CLIP.at - o))}>
-          <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} endAt={sec(CLIP.from) + 1} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-        </Sequence>
         <Sequence from={sec(CLIP.at - o)}>
           <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
         </Sequence>
-      </div>
-      <div style={{position: 'absolute', left: 90, top: 400}}>
-        <Clock3D size={170} k={p(t, E.clipCard + 0.3, 0.8, backOut)} t={t} />
+        {t < CLIP.at && (
+          <OffthreadVideo src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} endAt={sec(CLIP.from) + 1} muted style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover'}} />
+        )}
       </div>
     </Live>
   );
@@ -82,7 +76,7 @@ export const S3ThreeTaps: React.FC = () => {
   const icons = [<IconHome key="h" />, <IconUser key="u" />, <IconJoin key="j" />];
   const size = 270;
   return (
-    <Live t={t} t0={5.8} t1={10.2}>
+    <Live t={t} t0={4.4} t1={8.8}>
       <Center y={380}>
         <Words text={c.line1} at={E.line1} stagger={0.16} size={110} hl={hl(c.line1Highlight)} />
       </Center>
@@ -150,7 +144,7 @@ export const S4Problems: React.FC = () => {
   );
   const pulling = Math.max(0, Math.abs(pull));
   return (
-    <Live t={t} t0={9.6} t1={13.2}>
+    <Live t={t} t0={8.2} t1={11.8}>
       <AbsoluteFill style={{transform: `scale(${sx}, ${sy})`, transformOrigin: '50% 48%'}}>
         {/* reaction #2 — the "problems" */}
         <div
@@ -346,7 +340,7 @@ export const S6Logo: React.FC = () => {
     </div>
   );
   return (
-    <Live t={t} t0={19.7} t1={22} push={0.03} drift={0}>
+    <Live t={t} t0={18.5} t1={21} push={0.03} drift={0}>
       <div style={{position: 'absolute', left: (W - LW) / 2, top: 420, width: LW, height: LH, clipPath: `inset(0 ${(1 - k) * 100}% 0 0)`}}>
         <Extrude
           w={LW}

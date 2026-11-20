@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame} from 'remotion';
 import {CameraMotionBlur} from '@remotion/motion-blur';
 import {Bg} from './fx';
-import {CfgCtx, YA_MAX, S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo} from './scenes';
+import {CfgCtx, YA_MAX, S1Hook, S3ThreeTaps, S4Problems, S5App, S6Logo} from './scenes';
 import {H, Offset, W, applyColors, loadFonts, panEase, sec} from './theme';
 import {B, CLIP, DURATION, E, VO} from './timing';
 import {Cfg} from './config';
@@ -11,8 +11,8 @@ loadFonts();
 
 type Dir = 'left' | 'right' | 'up' | 'down';
 const T = 0.55; // pan length (s) — same weighted camera hand-off as the Saiqal piece
-const DIRS: Dir[] = ['left', 'up', 'left', 'up', 'right'];
-const SCENES = [S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo];
+const DIRS: Dir[] = ['up', 'left', 'up', 'right'];
+const SCENES = [S1Hook, S3ThreeTaps, S4Problems, S5App, S6Logo];
 export const TOTAL = sec(DURATION); // exact length, frame-accurate
 
 const vec = (d: Dir): [number, number] => (d === 'left' ? [-W, 0] : d === 'right' ? [W, 0] : d === 'up' ? [0, -H * 0.8] : [0, H * 0.8]);
