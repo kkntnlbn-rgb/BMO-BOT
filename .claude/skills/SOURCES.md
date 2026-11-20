@@ -4,7 +4,7 @@
 |---|---|---|---|
 | 01 | Head of Content | content-planner, instagram-research, tiktok-research, x-research, youtube-research, video-content-analyzer | github.com/bradautomates/head-of-content (MIT) |
 | 02 | AI SEO | ai-seo | github.com/coreyhaines31/marketingskills (MIT) |
-| 03 | Brand Guidelines | brand-guidelines | github.com/alirezarezvani/claude-skills (MIT) |
+| 03 | Brand Guidelines | brand-system | github.com/alirezarezvani/claude-skills (MIT) |
 | 04 | Marketing plugin (Anthropic) | brand-review, campaign-plan, competitive-brief, content-creation, draft-content, email-sequence, performance-report, seo-audit | github.com/anthropics/knowledge-work-plugins/marketing (Apache-2.0) |
 | 05 | Marketing Council | marketing-council | github.com/coreyhaines31/marketingskills (MIT) |
 | 06 | Lessie | people-search, lessie-email | github.com/LessieAI/lessie-skill |

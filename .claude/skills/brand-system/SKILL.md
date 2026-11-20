@@ -1,5 +1,5 @@
 ---
-name: brand-guidelines
+name: brand-system
 description: Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. Builds the color system, type scale and tone matrix for any brand.
 license: MIT
 metadata:
