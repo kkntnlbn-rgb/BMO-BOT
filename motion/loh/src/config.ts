@@ -37,7 +37,6 @@ export const schema = z.object({
 
   voVolume: z.number().min(0).max(2).step(0.05).describe('صوت التعليق'),
   clipVolume: z.number().min(0).max(2).step(0.05).describe('صوت لقطة الأوجي'),
-  clip2Volume: z.number().min(0).max(2).step(0.05).describe('صوت رياكشن المشاكل'),
   sfxVolume: z.number().min(0).max(2).step(0.05).describe('المؤثرات الصوتية'),
   motionBlur: z.number().int().min(1).max(8).describe('تمويه الحركة (1 = معاينة سريعة)'),
 });
@@ -72,7 +71,6 @@ export const defaults: Cfg = {
   taglineHighlight: 'بثلاث',
   voVolume: 1,
   clipVolume: 1,
-  clip2Volume: 0.45,
   sfxVolume: 1,
   motionBlur: 6,
 };

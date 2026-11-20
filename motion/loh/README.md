@@ -1,6 +1,6 @@
 # LOH — "سجّل براندك بثلاث ضغطات" (Remotion)
 
-9:16, 1080×1920, 60fps, **24.8s (1488 frames)**. Same motion language as `../saiqal` (camera-pan hand-offs,
+9:16, 1080×1920, 60fps, **22.0s (1320 frames)**. Same motion language as `../saiqal` (camera-pan hand-offs,
 motion blur, weighted quart-out entrances, live camera drift), re-skinned to the LOH identity:
 yellow `#f3c32c`, brown `#493929`, Thmanyah Serif Black.
 

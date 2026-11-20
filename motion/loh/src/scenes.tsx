@@ -24,7 +24,7 @@ export const S1Hook: React.FC = () => {
   const t = useT();
   const c = useCfg();
   return (
-    <Live t={t} t0={0} t1={3.1}>
+    <Live t={t} t0={0} t1={2.9}>
       <div style={{position: 'absolute', left: 760, top: 210}}>
         <Clock3D size={230} k={p(t, E.hookClock, 0.9, backOut)} t={t} spin={-360 * (1 - p(t, E.hookClock, 1.4))} />
       </div>
@@ -43,7 +43,7 @@ export const S2Reaction: React.FC = () => {
   const w = 940;
   const h = (w * 464) / 560;
   return (
-    <Live t={t} t0={2.5} t1={7.7} push={0.05}>
+    <Live t={t} t0={2.3} t1={6.4} push={0.05}>
       <div
         style={{
           position: 'absolute',
@@ -82,7 +82,7 @@ export const S3ThreeTaps: React.FC = () => {
   const icons = [<IconHome key="h" />, <IconUser key="u" />, <IconJoin key="j" />];
   const size = 270;
   return (
-    <Live t={t} t0={7.0} t1={11.6}>
+    <Live t={t} t0={5.8} t1={10.2}>
       <Center y={380}>
         <Words text={c.line1} at={E.line1} stagger={0.16} size={110} hl={hl(c.line1Highlight)} />
       </Center>
@@ -150,7 +150,7 @@ export const S4Problems: React.FC = () => {
   );
   const pulling = Math.max(0, Math.abs(pull));
   return (
-    <Live t={t} t0={10.9} t1={15.3}>
+    <Live t={t} t0={9.6} t1={13.2}>
       <AbsoluteFill style={{transform: `scale(${sx}, ${sy})`, transformOrigin: '50% 48%'}}>
         {/* reaction #2 — the "problems" */}
         <div
@@ -219,7 +219,7 @@ const Caption: React.FC<{t: number; text: string; at: number; until: number; hl:
   );
 };
 
-const typed = (t: number, at: number, s: string, cps = 24) => s.slice(0, Math.max(0, Math.floor((t - at) * cps)));
+const typed = (t: number, at: number, s: string, cps = 40) => s.slice(0, Math.max(0, Math.floor((t - at) * cps)));
 
 export const S5App: React.FC = () => {
   const t = useT();
@@ -346,7 +346,7 @@ export const S6Logo: React.FC = () => {
     </div>
   );
   return (
-    <Live t={t} t0={22.2} t1={24.8} push={0.03} drift={0}>
+    <Live t={t} t0={19.7} t1={22} push={0.03} drift={0}>
       <div style={{position: 'absolute', left: (W - LW) / 2, top: 420, width: LW, height: LH, clipPath: `inset(0 ${(1 - k) * 100}% 0 0)`}}>
         <Extrude
           w={LW}

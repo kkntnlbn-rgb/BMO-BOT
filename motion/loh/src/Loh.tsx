@@ -4,13 +4,13 @@ import {CameraMotionBlur} from '@remotion/motion-blur';
 import {Bg} from './fx';
 import {CfgCtx, YA_MAX, S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo} from './scenes';
 import {H, Offset, W, applyColors, loadFonts, panEase, sec} from './theme';
-import {B, CLIP, CLIP2, DURATION, E, VO} from './timing';
+import {B, CLIP, DURATION, E, VO} from './timing';
 import {Cfg} from './config';
 
 loadFonts();
 
 type Dir = 'left' | 'right' | 'up' | 'down';
-const T = 0.6; // pan length (s) — same weighted camera hand-off as the Saiqal piece
+const T = 0.55; // pan length (s) — same weighted camera hand-off as the Saiqal piece
 const DIRS: Dir[] = ['left', 'up', 'left', 'up', 'right'];
 const SCENES = [S1Hook, S2Reaction, S3ThreeTaps, S4Problems, S5App, S6Logo];
 export const TOTAL = sec(DURATION); // exact length, frame-accurate
@@ -68,15 +68,6 @@ export const Loh: React.FC<Cfg> = (cfg) => {
         ))}
         <Sequence from={sec(CLIP.at)} durationInFrames={sec(CLIP.to - CLIP.from)}>
           <Audio src={staticFile('media/og.mp4')} startFrom={sec(CLIP.from)} volume={cfg.clipVolume} />
-        </Sequence>
-
-        <Sequence from={sec(CLIP2.at)} durationInFrames={sec(Math.min(CLIP2.to - CLIP2.from, B[4] + 0.3 - CLIP2.at))}>
-          {/* sits under the voice-over, fades out with the pan */}
-          <Audio
-            src={staticFile('media/reaction2.mp4')}
-            startFrom={sec(CLIP2.from)}
-            volume={(f) => cfg.clip2Volume * interpolate(f, [0, 6, sec(B[4] - CLIP2.at - 0.3), sec(B[4] + 0.3 - CLIP2.at)], [0, 1, 1, 0], {extrapolateRight: 'clamp'})}
-          />
         </Sequence>
 
         {/* ── sound design ── */}
