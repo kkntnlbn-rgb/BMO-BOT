@@ -29,3 +29,4 @@ still stamp2  6 6.10
 still stamp3  6 8.60
 still stamp4  4 4.40
 still logosrc 1 3.05
+cut lounge    5 1.60 2.60

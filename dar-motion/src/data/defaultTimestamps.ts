@@ -9,6 +9,12 @@ export type Cue = {
   pills?: boolean; // terracotta pill stacking (box grows from a line)
   mode?: 'side' | 'center' | 'top';
   ink?: string; // text colour when sitting on light paper
+  lineStyle?: ('pill' | 'small' | undefined)[]; // per-line: dark knockout pill / smaller line
+  lineSpeech?: [number, number][]; // per-line spoken windows (overrides speech)
+  y?: number; // vertical centre override
+  size?: number; // base font size override
+  scene?: string; // rendered inside a scene (moves with its push transition) instead of the global layer
+  pillBg?: string; pillInk?: string;
   kashida?: { word: string; right: string; left: string; stretch: [number, number] }[];
 };
 
@@ -33,8 +39,12 @@ export const CUES: Cue[] = [
   { from: 25.94, to: 27.4, speech: [25.98, 27.2], lines: ['نكتب', 'فصل جديد'], mode: 'side',
     kashida: [{ word: 'جديد', right: 'جـ', left: 'ـديد', stretch: [0, 110] }] },
   { from: 30.48, to: 32.06, speech: [30.55, 31.6], lines: ['وهذي', 'البداية', 'بس…'], pills: true },
-  { from: 32.06, to: 33.49, speech: [32.1, 33.2], lines: ['وخلال', 'السنة', 'الجاية'], mode: 'side',
-    kashida: [{ word: 'الجاية', right: 'الجـ', left: 'ـاية', stretch: [0, 140] }] },
+  { from: 32.06, to: 36.2, speech: [32.1, 35.2], scene: 'promise', mode: 'center', ink: '#2B250D', y: 760, size: 108,
+    lines: ['وخلال السنة الجاية', 'نوعدكم', 'بفروع جديدة وتطور أكبر'], lineStyle: [undefined, 'pill', 'small'],
+    lineSpeech: [[32.1, 33.2], [33.5, 33.95], [34.0, 35.25]], pillBg: '#2B250D', pillInk: '#D8C78E',
+    kashida: [{ word: 'الجاية', right: 'الجـ', left: 'ـاية', stretch: [0, 120] }] },
+  { from: 36.2, to: 37.26, speech: [36.2, 36.8], scene: 'promise', mode: 'center', ink: '#2B250D', y: 1530, size: 120,
+    lines: ['بإذن الله'], lineStyle: ['small'] },
   { from: 37.26, to: 41.16, speech: [37.3, 40.6], lines: ['أهل النعيرية،', 'أهل الجبيل،', 'وكل من مرّ علينا…'], mode: 'top' },
 ];
 

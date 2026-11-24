@@ -9,7 +9,7 @@ import { PostageStampCard } from './components/PostageStampCard';
 import { SocialCommentCard } from './components/SocialCommentCard';
 import { InkCheckmark } from './components/InkCheckmark';
 import { PageCurl3D } from './components/PageCurl3D';
-import { Captions } from './components/Captions';
+import { Captions, SceneCaptions } from './components/Captions';
 import { DynamicKashida } from './components/DynamicKashida';
 import { Cut, Shot } from './components/Footage';
 import { BrandMap } from './components/BrandMap';
@@ -152,7 +152,7 @@ const FX: [string, number, number][] = [
   ['quick_whoosh', 7.70, 0.35], ['quick_whoosh', 7.97, 0.35], ['quick_whoosh', 8.23, 0.35], ['quick_whoosh', 8.50, 0.35],
   ['quick_whoosh', 10.2, 0.4], ['soft_pop', 12.25, 0.5], ['quick_whoosh', 14.53, 0.3], ['soft_pop', 16.61, 0.5],
   ['quick_whoosh', 19.45, 0.3], ['soft_pop', 22.67, 0.5], ['pin_drop', 28.6, 0.5], ['pin_drop', 29.4, 0.5],
-  ['card_flip_paper', 32.45, 0.65], ['soft_pop', 33.49, 0.5], ['pen_tick', 33.85, 0.6], ['pen_tick', 34.75, 0.6],
+  ['quick_whoosh', 32.06, 0.35], ['ui_bubble_pop', 33.4, 0.4], ['quick_whoosh', 35.6, 0.45], ['soft_pop', 36.1, 0.4], ['soft_pop', 36.27, 0.4],
   ['quick_whoosh', 37.26, 0.3], ['quick_whoosh', 41.16, 0.3], ['pen_tick', 44.6, 0.4],
 ];
 const SoundDesignTrack: React.FC = () => (
@@ -164,8 +164,56 @@ const SoundDesignTrack: React.FC = () => (
   </>
 );
 
+/* ---------- promise scene (replaces page-curl + checklist) ----------
+   Gold paper. Words build exactly like the reference (feathered reveal, knock-out pill),
+   then a whip-push: the whole text block shoots left with horizontal motion blur while a
+   rounded card of the lounge arrives from the right, tilted, and settles; Dar badges pop. */
+const PromiseScene: React.FC = () => {
+  const frame = useCurrentFrame(); const { fps } = useVideoConfig();
+  const t0 = F(32.06);
+  const w = F(35.6) - t0; // whip frame
+  const out = interpolate(frame, [w - 1, w + 8], [0, 1], { ...clamp, easing: Easing.bezier(0.55, 0, 0.9, 0.35) });
+  const inE = interpolate(frame, [w + 2, w + 13], [0, 1], { ...clamp, easing: Easing.bezier(0.12, 0.9, 0.25, 1) });
+  const inV = 1 - interpolate(frame, [w + 2, w + 13], [0, 1], { ...clamp, easing: Easing.out(Easing.quad) });
+  const drift = interpolate(frame, [w + 13, w + 60], [0, 1], clamp);
+  const badge = (d: number) => spring({ fps, frame: frame - (w + 14 + d), config: { damping: 12, stiffness: 220, mass: 0.6 } });
+  const hb = (id: string, v: number) => (
+    <svg width={0} height={0} style={{ position: 'absolute' }}><filter id={id} x="-30%" y="0" width="160%" height="100%"><feGaussianBlur stdDeviation={`${v.toFixed(1)} 0`} /></filter></svg>
+  );
+  return (
+    <AbsoluteFill>
+      <PaperBg tone="gold" />
+      {/* text block – pushed out */}
+      {hb('pr-out', out * 90)}
+      <AbsoluteFill style={{ transform: `translateX(${-out * 1150}px)`, filter: out > 0.01 ? 'url(#pr-out)' : undefined }}>
+        {frame < w + 10 && <SceneCaptions scene="promise" offset={t0} only={0} />}
+      </AbsoluteFill>
+      {/* card – pushed in */}
+      {frame >= w + 2 && (
+        <>
+          {hb('pr-in', inV * 80)}
+          <div style={{ position: 'absolute', left: 110, top: 520, width: 860, height: 860,
+            transform: `translateX(${(1 - inE) * 1100}px) rotate(${(-3.5 + (1 - inE) * 9 + drift * 1.2).toFixed(2)}deg) scale(${1 + drift * 0.02})`,
+            filter: inV > 0.02 ? 'url(#pr-in)' : undefined }}>
+            <div style={{ position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', boxShadow: '0 34px 60px rgba(30,25,8,.55)', border: '6px solid #2B250D' }}>
+              <Shot src="lounge" rate={0.55} push={0.05} />
+            </div>
+            {[[-26, -26, 0], [834, -26, 5]].map(([x, y, d], i) => (
+              <div key={i} style={{ position: 'absolute', left: x, top: y, width: 70, height: 70, borderRadius: 35, background: '#2B250D',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${badge(d)})`, boxShadow: '0 6px 14px rgba(0,0,0,.4)' }}>
+                <Img src={img('dar_mark_olive.png')} style={{ width: 40, filter: 'brightness(3.2) sepia(.6)' }} />
+              </div>
+            ))}
+          </div>
+          <SceneCaptions scene="promise" offset={t0} only={1} />
+        </>
+      )}
+    </AbsoluteFill>
+  );
+};
+
 /* ---------- the film ---------- */
-const GLITCH_CUTS = [2.93, 12.25, 16.61, 22.67, 33.49].map(F);
+const GLITCH_CUTS = [2.93, 12.25, 16.61, 22.67].map(F);
 const STACK = (n: string) => img(n);
 
 export const DarFilm: React.FC = () => {
@@ -179,20 +227,20 @@ export const DarFilm: React.FC = () => {
     <AbsoluteFill style={{ background: '#0c0a03' }}>
       <AbsoluteFill style={{ filter: fx }}>
         {/* 1 · sand paper, big centered words */}
-        <Cut from={0} to={1.64}><PaperBg tone="sand" /></Cut>
+        <Cut from={0} to={1.64} pushOut><PaperBg tone="sand" /></Cut>
         {/* 2 · rounded inset: the terrace */}
-        <Cut from={1.64} to={2.93}><Inset><Shot src="open" push={0} /></Inset></Cut>
+        <Cut from={1.64} to={2.93} pushIn><Inset><Shot src="open" push={0} /></Inset></Cut>
         {/* 3 · glitch → gold paper card */}
-        <Cut from={2.93} to={4.33}><PaperBg tone="gold" /></Cut>
+        <Cut from={2.93} to={4.33} pushOut><PaperBg tone="gold" /></Cut>
         {/* 4 · inset: branch front → pour into the Dar cup */}
-        <Cut from={4.33} to={7.58}>
+        <Cut from={4.33} to={7.58} pushIn pushOut>
           <Inset>
             <Sequence durationInFrames={rel(6.10, 4.33)}><Shot src="pipfront" rate={0.9} push={0} /></Sequence>
             <Sequence from={rel(6.10, 4.33)}><Shot src="pipcup" rate={0.8} push={0} /></Sequence>
           </Inset>
         </Cut>
         {/* 5–6 · sand paper: photos fly in and stack, then fly out to reveal the next words */}
-        <Cut from={7.58} to={12.25}>
+        <Cut from={7.58} to={12.25} pushIn>
           <PaperBg tone="sand" />
           <PhotoStack enterAt={4} gap={8} exitAt={rel(10.2, 7.58)} photos={[
             { src: STACK('stamp1.jpg'), x: 40, y: 430, w: 420, h: 520, r: -6, from: 'right' },
@@ -202,13 +250,13 @@ export const DarFilm: React.FC = () => {
           ]} />
         </Cut>
         {/* 7 · glitch → dark card: «مرحبا» */}
-        <Cut from={12.25} to={14.53}><PaperBg tone="dark" /></Cut>
+        <Cut from={12.25} to={14.53} pushOut><PaperBg tone="dark" /></Cut>
         {/* 8 · inset: the Dar wall */}
-        <Cut from={14.53} to={16.61}><Inset><Shot src="logodoor" rate={0.8} push={0} /></Inset></Cut>
+        <Cut from={14.53} to={16.61} pushIn><Inset><Shot src="logodoor" rate={0.8} push={0} /></Inset></Cut>
         {/* 9 · glitch → gold card: «وعد» */}
-        <Cut from={16.61} to={19.45}><PaperBg tone="gold" /></Cut>
+        <Cut from={16.61} to={19.45} pushOut><PaperBg tone="gold" /></Cut>
         {/* 10 · inset: hospitality details */}
-        <Cut from={19.45} to={22.67}>
+        <Cut from={19.45} to={22.67} pushIn>
           <Inset>
             <Sequence durationInFrames={24}><Shot src="match1" rate={0.6} push={0} /></Sequence>
             <Sequence from={24} durationInFrames={24}><Shot src="match2" rate={0.6} push={0} /></Sequence>
@@ -219,18 +267,15 @@ export const DarFilm: React.FC = () => {
         {/* 11 · glitch → full-bleed night montage */}
         <Cut from={22.67} to={23.51}><Shot src="night1" /></Cut>
         <Cut from={23.51} to={24.6}><Shot src="night2" rate={0.95} /></Cut>
-        <Cut from={24.6} to={25.94}><Shot src="night3" rate={0.64} /></Cut>
+        <Cut from={24.6} to={25.94} pushOut><Shot src="night3" rate={0.64} /></Cut>
         {/* 12 · projected logo → branded map */}
-        <Cut from={25.94} to={27.4}><Shot src="project" rate={0.45} /></Cut>
+        <Cut from={25.94} to={27.4} pushIn><Shot src="project" rate={0.45} /></Cut>
         <Cut from={27.4} to={30.48}><BrandMap /></Cut>
         {/* 13 · bar + growing pills → hand → 3D page curl */}
-        <Cut from={30.48} to={32.06}><Shot src="bar" rate={0.68} /></Cut>
-        <Cut from={32.06} to={32.45}><Shot src="hand" push={0} /></Cut>
-        <Cut from={32.45} to={33.49}><PaperBg tone="dark" /><PageCurl3D cardImageSrc={img('dar_card.png')} startFrame={-4} duration={30} scale={0.58} position={[-0.2, -0.02, 0]} /></Cut>
-        {/* 14 · glitch → ink checklist on sand paper */}
-        <Cut from={33.49} to={37.26}><Checklist /></Cut>
+        <Cut from={30.48} to={32.06} pushOut><Shot src="bar" rate={0.68} /></Cut>
+        <Cut from={32.06} to={37.26} pushIn pushOut><PromiseScene /></Cut>
         {/* 15 · inset: wide night → team */}
-        <Cut from={37.26} to={41.3}>
+        <Cut from={37.26} to={41.3} pushIn>
           <Inset>
             <Sequence durationInFrames={rel(39.2, 37.26)}><Shot src="wide" rate={0.67} push={0} /></Sequence>
             <Sequence from={rel(39.2, 37.26)}><Shot src="wave" rate={0.78} push={0} /></Sequence>
