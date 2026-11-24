@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Dar Motion</title>
+<style>
+@font-face{font-family:Naskh;font-weight:700;src:url(node_modules/@fontsource/noto-naskh-arabic/files/noto-naskh-arabic-arabic-700-normal.woff2)}
+@font-face{font-family:Naskh;font-weight:400;src:url(node_modules/@fontsource/noto-naskh-arabic/files/noto-naskh-arabic-arabic-400-normal.woff2)}
+@font-face{font-family:Ruqaa;font-weight:400;src:url(node_modules/@fontsource/aref-ruqaa/files/aref-ruqaa-arabic-400-normal.woff2)}
+@font-face{font-family:Ruqaa;font-weight:700;src:url(node_modules/@fontsource/aref-ruqaa/files/aref-ruqaa-arabic-700-normal.woff2)}
+@font-face{font-family:Amiri;font-weight:700;src:url(node_modules/@fontsource/amiri/files/amiri-arabic-700-normal.woff2)}
+@font-face{font-family:Tajawal;font-weight:400;src:url(node_modules/@fontsource/tajawal/files/tajawal-arabic-400-normal.woff2)}
+@font-face{font-family:Tajawal;font-weight:700;src:url(node_modules/@fontsource/tajawal/files/tajawal-arabic-700-normal.woff2)}
+
+:root{
+  --cream:#E6DDC8; --burgundy:#5B1914; --navy:#1C2440; --brown:#6B3A22; --paper:#F4F0E6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--cream)}
+#stage{position:absolute;inset:0;background:var(--cream);overflow:hidden}
+
+/* ticket frame: inset window with concave (scalloped) corners */
+#win{position:absolute;left:34px;right:34px;top:34px;bottom:34px;overflow:hidden;background:var(--burgundy);
+  --r:58px;
+  -webkit-mask:
+    radial-gradient(circle at 0 0,#0000 var(--r),#000 calc(var(--r) + 1px)) top left,
+    radial-gradient(circle at 100% 0,#0000 var(--r),#000 calc(var(--r) + 1px)) top right,
+    radial-gradient(circle at 0 100%,#0000 var(--r),#000 calc(var(--r) + 1px)) bottom left,
+    radial-gradient(circle at 100% 100%,#0000 var(--r),#000 calc(var(--r) + 1px)) bottom right;
+  -webkit-mask-size:51% 51%;-webkit-mask-repeat:no-repeat;}
+.layer{position:absolute;inset:0;overflow:hidden}
+.abs{position:absolute;will-change:transform,opacity}
+
+/* photo slot (real image or placeholder) */
+.slot{position:absolute;overflow:hidden;background:#3a2a22}
+.slot img{width:100%;height:100%;object-fit:cover;display:block}
+.ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:360px !important;gap:18px;
+  font-family:Tajawal;color:#f3ead8;text-align:center;padding:40px;position:relative}
+.ph::after{content:"";position:absolute;inset:22px;border:3px dashed rgba(243,234,216,.45);border-radius:18px}
+.ph .k{font-size:30px;letter-spacing:2px;opacity:.75;font-weight:700}
+.ph .d{font-size:46px;font-weight:700;line-height:1.35}
+.ph.small{justify-content:center;padding-bottom:40px !important}.ph.small .k{font-size:20px}.ph.small .d{font-size:28px}.ph.small::after{inset:10px;border-width:2px}
+
+/* white caption */
+#cap{position:absolute;right:110px;top:0;width:760px;text-align:right;font-family:Naskh;font-weight:700;
+  color:#fff;font-size:80px;line-height:1.28;text-shadow:0 4px 18px rgba(0,0,0,.45)}
+#cap .ln{display:block;white-space:nowrap}
+#cap .w{display:inline-block;margin-left:.22em}
+#cap.boxed .ln{display:table;margin-left:0;margin-right:0;margin-bottom:12px;margin-inline-start:auto}
+#cap.boxed .w{background:var(--burgundy);padding:4px 22px 12px;margin:0;border-radius:6px;text-shadow:none}
+
+/* paper note */
+.note{position:absolute;width:470px;height:300px;background:var(--paper);
+  background-image:repeating-linear-gradient(#0000 0 58px,#d9d2c3 58px 60px);background-position:0 70px;
+  box-shadow:0 18px 30px rgba(0,0,0,.35);font-family:Ruqaa;color:#2a2622;padding:38px 46px;
+  clip-path:polygon(0 0,100% 0,100% 82%,88% 100%,0 100%)}
+.note .t{font-size:42px;line-height:58px}
+.note .sig{position:absolute;left:46px;bottom:26px;font-size:30px;opacity:.7}
+.note .curl{position:absolute;right:0;bottom:0;width:12%;height:18%;
+  background:linear-gradient(135deg,#d8cfbd 0 48%,#0000 52%);filter:drop-shadow(-3px -3px 4px rgba(0,0,0,.25))}
+
+/* receipt tag */
+.tag{position:absolute;width:210px;height:96px;background:#fbf8f1;box-shadow:0 10px 18px rgba(0,0,0,.35);
+  font-family:Naskh;font-weight:700;color:#1d1a17;font-size:40px;display:flex;align-items:center;justify-content:center;gap:10px}
+.tag small{font-size:24px;font-weight:400;opacity:.75}
+
+/* postage stamp */
+.stamp{position:absolute;padding:20px;
+  background:radial-gradient(circle,#0000 8px,#f6f3ec 8.6px) -11px -11px/22px 22px;
+  filter:drop-shadow(0 14px 16px rgba(0,0,0,.4))}
+.stamp .slot{position:relative;border:3px solid #fff}
+
+/* comment bubble */
+.bub{position:absolute;width:470px;height:150px;background:#fff;border-radius:22px;box-shadow:0 10px 22px rgba(0,0,0,.3);
+  display:flex;align-items:center;gap:26px;padding:0 34px;font-family:Tajawal;direction:rtl}
+.bub .av{width:70px;height:70px;border-radius:50%;background:#d9d3c8;flex:none}
+.bub .l{flex:1;display:flex;flex-direction:column;gap:14px}
+.bub .l b{font-size:28px;color:#222}
+.bub .l i{font-style:normal;font-size:26px;color:#555}
+.bub .l u{text-decoration:none;font-size:22px;color:#999}
+
+/* page-curl paper */
+#curl{position:absolute;width:470px;height:680px;left:40px;top:560px}
+#curl .pg{position:absolute;inset:0;background:var(--paper);box-shadow:0 24px 40px rgba(0,0,0,.4);padding:56px 50px;font-family:Naskh;color:#2a2622}
+#curl .fold{position:absolute;left:0;top:0;background:linear-gradient(135deg,#0000 50%,#efe8d8 50%,#cfc5b0 100%);
+  filter:drop-shadow(6px 6px 10px rgba(0,0,0,.35))}
+.logo-txt{font-family:Ruqaa;font-weight:700;color:var(--navy)}
+
+/* checklist */
+#chk{position:absolute;inset:0;background:var(--cream);font-family:Naskh;color:#2a2622}
+#chk .it{position:absolute;right:120px;left:120px;height:300px;border-bottom:3px solid #cfc4ad}
+#chk .it h3{position:absolute;right:150px;top:70px;font-size:76px;font-weight:700}
+#chk .it p{position:absolute;right:150px;top:180px;font-size:38px;opacity:.7}
+#chk .box{position:absolute;right:0;top:80px;width:100px;height:100px;border:6px solid #2a2622;border-radius:6px}
+#chk svg{position:absolute;right:-10px;top:40px;overflow:visible}
+
+/* map */
+#map{position:absolute;inset:0;background:var(--navy)}
+
+/* outro watercolor */
+#outro{position:absolute;inset:0;background:var(--cream)}
+#wc{position:absolute;left:0;right:0;height:1500px;
+  -webkit-mask:linear-gradient(#0000 0,#000 160px);}
+#wcTitle{position:absolute;left:0;right:0;text-align:center;font-family:Amiri;font-weight:700;color:var(--brown);font-size:96px;line-height:1.35}
+#endlogo{position:absolute;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="win"></div>
+  <div id="outro"></div>
+  <div id="endlogo"></div>
+</div>
+<script>
+/* ======================== CONFIG ======================== */
+const FPS = 25;
+const VO_END = 44.6, DUR = 47.8;
+// assets present on disk are injected by render.js as window.ASSETS = {name: "assets/file.jpg"}
+const A = window.ASSETS || {};
+
+/* ======================== HELPERS ======================== */
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const prog=(t,a,d)=>clamp((t-a)/d);
+const eOutCubic=x=>1-Math.pow(1-x,3);
+const eInCubic=x=>x*x*x;
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eOutBack=(x,s=1.9)=>1+(s+1)*Math.pow(x-1,3)+s*Math.pow(x-1,2);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const el=(tag,cls,parent,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;(parent||document.body).appendChild(e);return e};
+const set=(e,o,tr)=>{e.style.opacity=o;e.style.transform=tr;e.style.visibility=o<=0.001?'hidden':'visible'};
+const vis=(e,on)=>{e.style.display=on?'':'none'};
+
+// photo slot: real asset if provided, else labelled placeholder
+const TONES={day:['#8a7a5e','#c9b48c'],night:['#0d0f17','#3a2f22'],warm:['#6d4a33','#b88c63'],sea:['#3f6475','#a9c2c4']};
+function slot(parent,key,label,tone='warm',small=false){
+  const s=el('div','slot',parent);
+  if(A[key]){const i=el('img','',s);i.src=A[key];}
+  else{const [a,b]=TONES[tone];s.style.background=`linear-gradient(160deg,${b},${a})`;
+       el('div','ph'+(small?' small':''),s,`<div class="k">${key}</div><div class="d">${label}</div>`);}
+  return s;
+}
+const full=s=>{Object.assign(s.style,{left:0,top:0,width:'100%',height:'100%'});return s};
+
+// pop-in: scale 0.6 -> 1.06 -> 1 , quick fade (≈7 frames)
+function pop(t,t0,dur=.28){const x=prog(t,t0,dur);return{o:clamp((t-t0)/.1),s:t<t0?.6:lerp(.6,1,eOutBack(x))}}
+
+/* ======================== BUILD ======================== */
+const W=document.getElementById('win');           // 1012 x 1852 window
+const WW=1012,WH=1852;
+const scenes={};
+function L(name){const l=el('div','layer',W);scenes[name]=l;return l}
+
+// A — opening
+const lA=L('A'); full(slot(lA,'01-opening','لقطة افتتاحية<br>النعيرية / الجبيل من فوق','day'));
+// B — match cuts: same object, different places
+const lB=L('B'); const Bs=[1,2,3,4].map(i=>full(slot(lB,`02-match-${i}`,`نفس العنصر (كوب دار)<br>في مكان ${['أول','ثاني','ثالث','رابع'][i-1]}<br>وبنفس موقعه في الكادر`,i%2?'day':'warm')));
+// C — inset card on top of last match shot, then burgundy collage
+const lC=L('C'); const cBg=el('div','layer',lC); cBg.style.background='var(--burgundy)';
+const cCard=el('div','abs',lC); Object.assign(cCard.style,{left:'90px',top:'560px',width:'470px',height:'660px',boxShadow:'0 20px 40px rgba(0,0,0,.45)'});
+const cImg1=full(slot(cCard,'03-card-front','واجهة فرع النعيرية','warm',true));
+const cImg2=full(slot(cCard,'04-card-cup','يد ماسكة كوب دار','warm',true));
+const tags=[[ 60,1080,-8],[150,1290,6],[ 330,1430,-4]].map(([x,y,r])=>{const g=el('div','tag abs',lC,'دار <small>النعيرية</small>');g.style.left=x+'px';g.style.top=y+'px';g.dataset.r=r;return g});
+// D — notes collage
+const lD=L('D'); lD.style.background='var(--burgundy)';
+const NOTES=[['مرحبا…<br>والقلب أوسع من الدار',40,480,-5],['هنا تحس<br>إنك بين أهلك',30,860,4],['ضيافة وراحة<br>في كل زيارة',50,1200,-3]];
+const notes=NOTES.map(([txt,x,y,r])=>{const n=el('div','note abs',lD,`<div class="t">${txt}</div><div class="sig">دار</div><div class="curl"></div>`);n.style.left=x+'px';n.style.top=y+'px';n.dataset.r=r;return n});
+// E — stamps (over notes)
+const lE=L('E');
+const STAMPS=[['05-stamp-1','النعيرية ١',40,470,300,380,-7,'warm'],['05-stamp-2','النعيرية ٢',235,600,240,330,5,'sea'],['05-stamp-3','النعيرية ٣',110,930,280,360,-3,'day']];
+const stamps=STAMPS.map(([k,lab,x,y,w,h,r,tone])=>{const s=el('div','stamp abs',lE);s.style.left=x+'px';s.style.top=y+'px';s.dataset.r=r;
+  const im=slot(s,k,lab,tone,true);im.style.width=w+'px';im.style.height=h+'px';return s});
+// F — comment bubbles (paste real comments)
+const lF=L('F');
+const bubs=[0,1,2].map(i=>{const b=el('div','bub abs',lF,`<div class="av"></div><div class="l"><b>اسم الزبون</b><i>ضع هنا لقطة تعليق حقيقي ${i+1}</i><u>رد</u></div>`);
+  b.style.left='40px';b.style.top=(560+i*250)+'px';return b});
+// G — night cuts
+const lG=L('G'); const Gs=[['06-night-1','لوحة دار ليلاً','night'],['06-night-2','كوب دار داخل السيارة','night'],['06-night-3','جلسات الفرع ليلاً','night']].map(([k,l,t])=>full(slot(lG,k,l,t)));
+// H — facade + map
+const lH=L('H'); const hFac=full(slot(lH,'07-fanateer-front','واجهة فرع الفناتير','night'));
+const hMap=el('div','layer',lH); hMap.id='map';
+hMap.innerHTML=`<svg width="1012" height="1852" viewBox="0 0 1012 1852">
+ <defs><linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a2320"/><stop offset="1" stop-color="#5b1914"/></linearGradient></defs>
+ <path id="landP" d="M0 0 H560 C600 160 690 260 760 420 C820 560 760 650 830 780 C900 900 1012 980 1012 1060 V1852 H0 Z" fill="url(#land)"/>
+ <g id="roads" fill="none" stroke="#f0c9b6" stroke-width="7" stroke-linecap="round" opacity=".85">
+  <path d="M60 1700 C200 1420 260 1220 300 980 C330 800 300 600 360 380"/>
+  <path d="M300 980 C480 960 600 940 760 900"/>
+  <path d="M120 760 C300 760 520 720 700 620"/>
+  <path d="M360 380 C420 520 560 600 700 620"/>
+  <path d="M520 1500 C600 1300 700 1120 800 980"/>
+ </g>
+ <path id="route" d="M300 600 C420 760 560 860 700 930" fill="none" stroke="#fff" stroke-width="9" stroke-dasharray="22 18" stroke-linecap="round"/>
+ <g id="pin1" transform="translate(300 600)"><path d="M0 0 C-26 -36 -40 -54 -40 -78 A40 40 0 1 1 40 -78 C40 -54 26 -36 0 0Z" fill="#fff"/><circle cy="-78" r="15" fill="#5b1914"/></g>
+ <g id="pin2" transform="translate(700 930)"><path d="M0 0 C-26 -36 -40 -54 -40 -78 A40 40 0 1 1 40 -78 C40 -54 26 -36 0 0Z" fill="#fff"/><circle cy="-78" r="15" fill="#5b1914"/></g>
+ <text id="lb1" x="300" y="720" text-anchor="middle" font-family="Naskh" font-weight="700" font-size="62" fill="#fff">النعيرية</text>
+ <text id="lb2" x="660" y="1050" text-anchor="middle" font-family="Naskh" font-weight="700" font-size="62" fill="#fff">الفناتير · الجبيل</text>
+ <text x="860" y="300" text-anchor="middle" font-family="Naskh" font-size="40" fill="#8d97b8" opacity=".8">الخليج العربي</text>
+</svg>`;
+['#pin1','#pin2'].forEach(id=>{const g=hMap.querySelector(id);const [tx,ty]=g.getAttribute('transform').match(/[\d.]+/g);g.dataset.tx=tx;g.dataset.ty=ty});
+// I — interior with boxed text, hand cut, page-curl
+const lI=L('I'); const iInt=full(slot(lI,'08-interior','داخل الفرع الجديد','warm')); const iHand=full(slot(lI,'09-hand','يد تفتح باب الفرع<br>أو تقلب صفحة','warm'));
+const iBg=el('div','layer',lI); iBg.style.background='var(--burgundy)';
+const curl=el('div','',lI); curl.id='curl';
+curl.innerHTML=`<div class="pg"><div class="logo-txt" style="font-size:96px;text-align:center;line-height:1">دار</div>
+ <div style="text-align:center;font-size:34px;margin:18px 0 40px;opacity:.75">حكاية دار</div>
+ <div style="font-size:40px;font-weight:700;margin:26px 0 6px">الفصل الأول</div><div style="font-size:32px;opacity:.7">النعيرية</div>
+ <div style="font-size:40px;font-weight:700;margin:30px 0 6px">الفصل الثاني</div><div style="font-size:32px;opacity:.7">الفناتير · الجبيل</div>
+ <div style="font-size:40px;font-weight:700;margin:30px 0 6px">الفصل الجاي</div><div style="font-size:32px;opacity:.7">قريباً بإذن الله</div></div><div class="fold"></div>`;
+const curlPg=curl.querySelector('.pg'), curlFold=curl.querySelector('.fold');
+// J — checklist
+const lJ=L('J'); const chk=el('div','',lJ); chk.id='chk';
+const CH=[['النعيرية','الفرع الأول',true],['الفناتير · الجبيل','الفرع الثاني',true],['فرعنا الجاي','قريباً بإذن الله',false]];
+const chkMarks=CH.map(([h,sub,ok],i)=>{const it=el('div','it',chk);it.style.top=(360+i*390)+'px';
+  it.innerHTML=`<h3>${h}</h3><p>${sub}</p><div class="box"></div>`+
+   (ok?`<svg width="140" height="140" viewBox="0 0 140 140"><path d="M22 74 L58 112 L128 8" fill="none" stroke="#1d1a17" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      :`<svg width="140" height="140" viewBox="0 0 140 140"><text x="70" y="108" text-anchor="middle" font-family="Ruqaa" font-weight="700" font-size="92" fill="#5b1914">؟</text></svg>`);
+  const p=it.querySelector('svg path');if(p){const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.dataset.l=L}
+  return it});
+// K — wide night facade with tracked sign
+const lK=L('K'); full(slot(lK,'10-wide-night','الواجهة من بعيد ليلاً<br>(سيارة تمر قدامها)','night'));
+const sign=el('div','abs',lK,'حيّاكم في دار'); Object.assign(sign.style,{left:'0',right:'0',top:'360px',textAlign:'center',fontFamily:'Naskh',fontWeight:700,fontSize:'64px',color:'#fff7e6',
+  textShadow:'0 0 18px rgba(255,214,150,.8),0 0 40px rgba(255,190,110,.5)',transform:'perspective(900px) rotateY(-8deg)'});
+
+// caption
+const cap=el('div','',W); cap.id='cap';
+
+// outro
+const outro=document.getElementById('outro');
+const wc=el('div','',outro); wc.id='wc';
+wc.innerHTML = A['11-watercolor'] ? `<img src="${A['11-watercolor']}" style="width:100%;height:100%;object-fit:cover">` :
+ `<div style="position:absolute;inset:0;background:
+   radial-gradient(60% 30% at 30% 75%,rgba(120,170,175,.55),#0000 70%),
+   radial-gradient(50% 25% at 75% 82%,rgba(96,150,160,.5),#0000 70%),
+   radial-gradient(45% 30% at 65% 45%,rgba(214,190,140,.55),#0000 70%),
+   radial-gradient(40% 25% at 25% 40%,rgba(200,170,120,.45),#0000 70%),
+   radial-gradient(70% 20% at 50% 95%,rgba(130,160,110,.45),#0000 70%);filter:blur(6px)"></div>
+  <div class="ph small" style="position:absolute;left:300px;right:300px;bottom:260px;height:200px;color:#6b3a22"><div class="k">11-watercolor</div><div class="d">لوحة مائية للجبيل</div></div>`;
+const wcTitle=el('div','',outro); wcTitle.id='wcTitle';
+const endlogo=document.getElementById('endlogo');
+endlogo.innerHTML = A['logo'] ? `<img src="${A['logo']}" style="width:420px">` : `<div class="logo-txt" style="font-size:260px">دار</div>`;
+
+/* ======================== CAPTIONS ======================== */
+// [start, end(visible until), lines (words separated by space), speech window for word timing, boxed?]
+const CAPS=[
+ [0.00,1.64,['ياهلا وسهلا!'],[0.02,0.9]],
+ [1.64,2.93,['كثير يسألونا…'],[1.64,2.4]],
+ [2.93,4.33,['ليه سميناه','دار؟'],[2.93,3.85]],
+ [4.33,7.58,['لأننا من البداية','ما بغيناه','مقهى وبس…'],[4.33,7.2]],
+ [7.58,10.46,['بغيناه مكان','تحس فيـه','إنك بين أهلك'],[7.58,9.9]],
+ [10.46,12.25,['ومن أول يوم','في النعيـرية'],[10.46,11.8]],
+ [12.25,14.53,['كانت كلمتنا:','مرحبـا…'],[12.25,14.0]],
+ [14.53,16.61,['والقلب أوسع','من الـدار'],[14.53,16.1]],
+ [16.61,19.45,['وما كانت عبارة','وبس…','كانت وعد'],[16.61,19.0]],
+ [19.45,22.67,['إن كل زيارة','تكون مليانة','ضيافة وراحة'],[19.45,22.1]],
+ [22.67,25.94,['واليوم،','بفضل الله','ثم ثقتكم وحبكم'],[22.67,25.5]],
+ [25.94,28.85,['نكتب فصل جديد','بافتتاح','فرعنا الثاني'],[25.94,28.5]],
+ [28.85,30.48,['في الفناتير','بالجبيل'],[28.85,29.9]],
+ [30.48,32.06,['وهذي','البداية','بس…'],[30.48,31.6],true],
+ [32.06,33.49,['وخلال','السنة الجاية'],[32.06,33.2]],
+ [37.26,41.16,['أهل النعيرية،','أهل الجبيل،','وكل من مرّ علينا…'],[37.26,40.6]],
+];
+// pre-split + per-word timing proportional to length
+const CAPW=CAPS.map(([s,e,lines,[a,b],boxed])=>{
+  const words=[];lines.forEach((ln,li)=>ln.split(' ').forEach(w=>words.push({w,li})));
+  const tot=words.reduce((n,x)=>n+x.w.length+2,0);let acc=0;
+  words.forEach(x=>{x.t=a+(b-a)*acc/tot;acc+=x.w.length+2});
+  return {s,e,lines,words,boxed:!!boxed};
+});
+const CAPY={default:820};
+function drawCap(t){
+  const c=CAPW.find(c=>t>=c.s&&t<c.e);
+  if(!c){cap.innerHTML='';return}
+  cap.className=c.boxed?'boxed':'';
+  let html='';c.lines.forEach((_,li)=>{
+    const ws=c.words.filter(x=>x.li===li).map(x=>`<span class="w" style="visibility:${t>=x.t?'visible':'hidden'}">${x.w}</span>`).join('');
+    html+=`<span class="ln">${ws}</span>`});
+  cap.innerHTML=html;
+  const h=c.lines.length*102;
+  cap.style.top=((c.boxed?640:CAPY.default)-h/2)+'px';
+}
+
+/* ======================== RENDER(t) ======================== */
+const SCN=[['A',0,1.64],['B',1.64,4.33],['C',4.33,7.58],['D',7.58,11.0],['E',10.46,17.4],['F',16.61,22.67],['G',22.67,25.94],['H',25.94,30.48],['I',30.48,33.49],['J',33.49,37.26],['K',37.26,41.16]];
+window.render=function(t){
+  // scene visibility (+ background layers stay under)
+  SCN.forEach(([n,a,b])=>vis(scenes[n],t>=a&&t<b));
+
+  // B: hard cuts on the beat, object stays in place
+  const bc=[1.64,2.05,2.45,2.93];Bs.forEach((s,i)=>vis(s,t>=bc[i]&&(i===3||t<bc[i+1])));
+  if(t>=4.33&&t<4.70) vis(Bs[3],true);
+
+  // C: card drops in over last match shot, then bg turns burgundy and card shrinks
+  vis(cBg,t>=4.70);
+  if(t>=4.33&&t<4.70) vis(scenes.B,true);
+  { const p=pop(t,4.33,.26); const shrink=eOutCubic(prog(t,4.70,.35));
+    const sc=p.s*lerp(1.12,0.92,shrink);
+    set(cCard,p.o,`scale(${sc}) rotate(${lerp(0,-1.5,shrink)}deg)`); }
+  vis(cImg2,t>=6.10);
+  tags.forEach((g,i)=>{const p=pop(t,6.45+i*.14,.24);set(g,p.o,`rotate(${g.dataset.r}deg) scale(${p.s})`)});
+
+  // D: notes fly in staggered with rotation
+  notes.forEach((n,i)=>{const t0=7.58+i*.13;const x=prog(t,t0,.32);const o=clamp((t-t0)/.08);
+    const dy=lerp(140,0,eOutCubic(x));const r=+n.dataset.r+lerp(10,0,eOutBack(x));
+    set(n,o,`translateY(${dy}px) rotate(${r}deg) scale(${lerp(.85,1,eOutBack(x))})`)});
+
+  // E: stamps pop staggered, slow drift, then fly out up staggered (overlapping F entry)
+  stamps.forEach((s,i)=>{const p=pop(t,10.46+i*.12,.28);
+    const drift=(t-10.46)*6; const out=eInCubic(prog(t,16.61+i*.1,.38));
+    set(s,p.o*(1-clamp(out*1.2-0.2)),`translate(${-drift*0.3}px,${-drift*0.5-out*1400}px) rotate(${+s.dataset.r+(t-10.46)*.25-out*12}deg) scale(${p.s*(1+(t-10.46)*.004)})`)});
+
+  // F: bubbles enter staggered (overlap with stamps leaving) and exit up staggered
+  bubs.forEach((b,i)=>{const p=pop(t,16.65+i*.14,.26);const out=eInCubic(prog(t,22.2+i*.08,.32));
+    set(b,p.o,`translateY(${lerp(60,0,eOutCubic(prog(t,16.65+i*.14,.26)))-out*1500}px) scale(${p.s})`)});
+
+  // G: night hard cuts
+  const gc=[22.67,23.51,24.6];Gs.forEach((s,i)=>vis(s,t>=gc[i]&&(i===2||t<gc[i+1])));
+
+  // H: facade then map (roads draw, zoom out, pins drop, route draws)
+  const mapOn=t>=27.4; vis(hMap,mapOn);
+  if(mapOn){
+    const z=lerp(1.35,1,eOutCubic(prog(t,27.4,1.1)));
+    hMap.querySelector('svg').style.transform=`scale(${z})`;hMap.querySelector('svg').style.transformOrigin='50% 45%';
+    hMap.querySelectorAll('#roads path').forEach((p,i)=>{const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L*(1-eOutCubic(prog(t,27.45+i*.08,.9)))});
+    const r=hMap.querySelector('#route');const rl=900;const rp=eInOut(prog(t,29.0,1.0));
+    r.style.opacity=rp>0?1:0; r.style.strokeDashoffset=0;
+    r.setAttribute('stroke-dasharray',`22 18`); r.style.clipPath=`inset(0 ${(1-rp)*100}% 0 0)`;
+    [['#pin1','#lb1',28.6],['#pin2','#lb2',29.45]].forEach(([pi,lb,t0])=>{const x=prog(t,t0,.35);const g=hMap.querySelector(pi);
+      g.setAttribute('transform',`translate(${g.dataset.tx} ${+g.dataset.ty-lerp(120,0,eOutBack(x))})`);g.style.opacity=clamp((t-t0)/.08);
+      hMap.querySelector(lb).style.opacity=clamp((t-t0-.15)/.2)});
+  }
+
+  // I: interior (boxed text) -> quick real hand -> paper enters with page curl
+  vis(iInt,t<32.06); vis(iHand,t>=32.06&&t<32.45); vis(iBg,t>=32.45); vis(curl,t>=32.45);
+  if(t>=32.45){const x=prog(t,32.45,.75);const e=eOutCubic(x);
+    const f=lerp(560,0,eOutCubic(prog(t,32.55,.8)));   // folded corner size
+    curl.style.transform=`translate(${lerp(-520,0,e)}px,${lerp(-620,0,e)}px) rotate(${lerp(-38,-3,e)}deg) scale(${lerp(.8,1,e)})`;
+    curlPg.style.clipPath=`polygon(${f}px 0,100% 0,100% 100%,0 100%,0 ${f}px)`;
+    Object.assign(curlFold.style,{width:f+'px',height:f+'px',opacity:f>2?1:0});}
+
+  // J: checklist: ticks draw one after another
+  chkMarks.forEach((it,i)=>{const p=it.querySelector('svg path');const t0=[33.9,34.8,35.8][i];
+    if(p){p.style.strokeDashoffset=p.dataset.l*(1-eOutCubic(prog(t,t0,.35)))}
+    else{const tx=it.querySelector('svg');tx.style.opacity=clamp((t-t0)/.25);tx.style.transform=`scale(${lerp(.6,1,eOutBack(prog(t,t0,.3)))})`}});
+
+  // K: tracked sign subtle parallax
+  sign.style.transform=`perspective(900px) rotateY(-8deg) translateX(${(t-37.26)*-6}px)`;
+
+  // captions (map scene carries its own labels)
+  drawCap(t); if(t>=27.4&&t<30.48) cap.innerHTML='';
+
+  // FRAME → OUTRO: ticket window disappears at 41.16, watercolor rises from bottom
+  const outroOn=t>=41.16&&t<VO_END;
+  vis(W,t<41.16); vis(outro,outroOn);
+  if(outroOn){const y=eOutCubic(prog(t,41.16,.7));
+    wc.style.top=lerp(1920,560,y)+'px';
+    wcTitle.style.top=lerp(1920+140,560+150,y)+'px';
+    const l1=['يا هلا','وسهلا…'],l2=['والقلب','أوسع','من الـدار'];
+    const tm=[41.2,41.6],tm2=[42.54,43.37,43.75];
+    wcTitle.innerHTML=`<div>${l1.map((w,i)=>`<span style="visibility:${t>=tm[i]?'visible':'hidden'}">${w}</span>`).join(' ')}</div>`+
+      `<div>${l2.map((w,i)=>`<span style="visibility:${t>=tm2[i]?'visible':'hidden'}">${w}</span>`).join(' ')}</div>`;}
+  vis(endlogo,t>=VO_END);
+};
+window.render(0);
+</script>
+</body>
+</html>
