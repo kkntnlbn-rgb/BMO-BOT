@@ -21,19 +21,19 @@ export type Cue = {
 const OLIVE = '#413815';
 export const CUES: Cue[] = [
   { from: 0.0, to: 1.64, speech: [0.05, 0.9], lines: ['ياهلا', 'وسهلا!'], mode: 'center', ink: OLIVE },
-  { from: 1.64, to: 2.93, speech: [1.75, 2.45], lines: ['كثير يسألونا…'], mode: 'top' },
+  { from: 1.64, to: 2.93, speech: [1.75, 2.45], lines: ['كثير يسألونا…'], mode: 'side' },
   { from: 2.93, to: 4.33, speech: [2.98, 3.85], lines: ['ليه سميناه', 'دار؟'], mode: 'center',
     kashida: [{ word: 'سميناه', right: 'سميـ', left: 'ـناه', stretch: [0, 110] }] },
-  { from: 4.33, to: 7.58, speech: [4.4, 7.2], lines: ['لأننا من البداية', 'ما بغيناه', 'مقهى وبس…'], mode: 'top' },
+  { from: 4.33, to: 7.58, speech: [4.4, 7.2], lines: ['لأننا من البداية', 'ما بغيناه', 'مقهى وبس…'], mode: 'side' },
   { from: 7.58, to: 10.46, speech: [7.6, 9.9], lines: ['بغيناه مكان', 'تحس فيه', 'إنك بين أهلك'], mode: 'side', ink: OLIVE,
     kashida: [{ word: 'أهلك', right: 'أهـ', left: 'ـلك', stretch: [0, 130] }] },
   { from: 10.46, to: 12.25, speech: [10.5, 11.8], lines: ['ومن أول يوم', 'في النعيرية'], mode: 'center', ink: OLIVE },
   { from: 12.25, to: 14.53, speech: [12.3, 14.0], lines: ['كانت كلمتنا:', 'مرحبا…'], mode: 'center',
     kashida: [{ word: 'مرحبا…', right: 'مرحـ', left: 'ـبا…', stretch: [0, 170] }] },
-  { from: 14.53, to: 16.61, speech: [14.6, 16.1], lines: ['والقلب أوسع', 'من الدار'], mode: 'top',
+  { from: 14.53, to: 16.61, speech: [14.6, 16.1], lines: ['والقلب أوسع', 'من الدار'], mode: 'side',
     kashida: [{ word: 'أوسع', right: 'أوسـ', left: 'ـع', stretch: [0, 120] }] },
   { from: 16.61, to: 19.45, speech: [16.66, 19.0], lines: ['وما كانت', 'عبارة وبس…', 'كانت وعد'], mode: 'center' },
-  { from: 19.45, to: 22.67, speech: [19.5, 22.1], lines: ['إن كل زيارة', 'تكون مليانة', 'ضيافة وراحة'], mode: 'top',
+  { from: 19.45, to: 22.67, speech: [19.5, 22.1], lines: ['إن كل زيارة', 'تكون مليانة', 'ضيافة وراحة'], mode: 'side',
     kashida: [{ word: 'وراحة', right: 'وراحـ', left: 'ـة', stretch: [0, 100] }] },
   { from: 22.67, to: 25.94, speech: [22.72, 25.5], lines: ['واليوم،', 'بفضل الله', 'ثم ثقتكم', 'وحبكم'], mode: 'side' },
   { from: 25.94, to: 27.4, speech: [25.98, 27.2], lines: ['نكتب', 'فصل جديد'], mode: 'side',
@@ -45,7 +45,7 @@ export const CUES: Cue[] = [
     kashida: [{ word: 'الجاية', right: 'الجـ', left: 'ـاية', stretch: [0, 120] }] },
   { from: 36.2, to: 37.26, speech: [36.2, 36.8], scene: 'promise', mode: 'center', y: 1500, size: 120,
     lines: ['بإذن الله'], lineStyle: ['small'] },
-  { from: 37.26, to: 41.16, speech: [37.3, 40.6], lines: ['أهل النعيرية،', 'أهل الجبيل،', 'وكل من مرّ علينا…'], mode: 'top' },
+  { from: 37.26, to: 41.16, speech: [37.3, 40.6], lines: ['أهل النعيرية،', 'أهل الجبيل،', 'وكل من مرّ علينا…'], mode: 'side' },
 ];
 
 // outro title (brown serif) word times

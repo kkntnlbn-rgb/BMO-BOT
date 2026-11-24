@@ -4,7 +4,9 @@ import { AbsoluteFill, Easing, interpolate, OffthreadVideo, Sequence, staticFile
 // Full-bleed live-action shot with a slow push-in ("camera is always alive").
 export const Shot: React.FC<{ src: string; rate?: number; push?: number }> = ({ src, rate = 1, push = 0.05 }) => {
   const frame = useCurrentFrame();
-  const s = 1 + interpolate(frame, [0, 90], [0, push], { extrapolateRight: 'clamp' });
+  // arrives slightly enlarged and settles (expo-out), then keeps a slow push – never static
+  const settle = interpolate(frame, [0, 22], [0.1, 0], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const s = 1 + settle + interpolate(frame, [0, 150], [0, Math.max(push, 0.04)], { extrapolateRight: 'clamp' });
   return (
     <AbsoluteFill style={{ transform: `scale(${s})` }}>
       <OffthreadVideo src={staticFile(`assets/video/${src}.mp4`)} playbackRate={rate} muted

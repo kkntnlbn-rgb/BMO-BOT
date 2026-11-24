@@ -29,7 +29,6 @@ export const Inset: React.FC<{ children: React.ReactNode; top?: number; height?:
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{ transform: `scale(${push})` }}>{children}</AbsoluteFill>
-      <AbsoluteFill style={{ background: 'linear-gradient(rgba(20,16,4,.42) 0%, rgba(20,16,4,0) 34%)' }} />
     </AbsoluteFill>
   );
 };
