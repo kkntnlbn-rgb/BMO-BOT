@@ -13,6 +13,7 @@ import { Captions } from './components/Captions';
 import { DynamicKashida } from './components/DynamicKashida';
 import { Cut, Shot } from './components/Footage';
 import { BrandMap } from './components/BrandMap';
+import { DrawBracket, glitchFilter, Inset, PaperBg, PhotoStack } from './components/Editorial';
 
 loadFont({ family: 'Thmanyah Serif', url: staticFile('assets/fonts/thmanyah-serif-text-black.otf'), weight: '900' });
 
@@ -77,7 +78,8 @@ const Checklist: React.FC = () => {
   const frame = useCurrentFrame(); const { fps } = useVideoConfig();
   const q = spring({ fps, frame: frame - F(2.25), config: { damping: 22, stiffness: 300, mass: 0.8 } });
   return (
-    <AbsoluteFill dir="rtl" style={{ background: COLORS.cream, fontFamily: FONTS.kinetic, fontWeight: 900, color: COLORS.ink }}>
+    <AbsoluteFill dir="rtl" style={{ fontFamily: FONTS.kinetic, fontWeight: 900, color: COLORS.ink }}>
+      <PaperBg tone="sand" />
       {items.map(([h, p], i) => (
         <div key={i} style={{ position: 'absolute', right: 90, left: 90, top: 330 + i * 430, height: 400, borderBottom: i < 2 ? '3px solid rgba(65,56,21,.35)' : 'none' }}>
           <div style={{ position: 'absolute', right: 0, top: 60 }}>
@@ -98,11 +100,12 @@ const Checklist: React.FC = () => {
 const Outro: React.FC = () => {
   const frame = useCurrentFrame(); const { fps } = useVideoConfig();
   const t0 = F(41.16);
-  const cam = interpolate(frame, [0, F(44.6) - t0], [1, 1.04]);
+  const cam = interpolate(frame, [0, F(44.6) - t0], [1.22, 1], { ...clamp, easing: Easing.bezier(0.33, 0, 0.2, 1) });
   const ty = interpolate(frame, [0, F(44.6) - t0], [0, -18]);
   const words = OUTRO_WORDS;
   return (
-    <AbsoluteFill style={{ background: COLORS.cream }}>
+    <AbsoluteFill>
+      <PaperBg tone="sand" />
       <AbsoluteFill style={{ transform: `translateY(${ty}px) scale(${cam})`, filter: 'saturate(0.72) contrast(0.9) brightness(1.08) sepia(0.12) blur(0.6px)' }}>
         <Shot src="aerial" rate={0.6} push={0} />
       </AbsoluteFill>
@@ -134,7 +137,9 @@ const Logo: React.FC = () => {
   const fill = interpolate(frame, [24, 40], [0, 1], clamp);
   const box: React.CSSProperties = { position: 'absolute', width: 520, left: 280, top: 620 };
   return (
-    <AbsoluteFill style={{ background: COLORS.cream, transform: `scale(${0.97 + 0.03 * s})` }}>
+    <AbsoluteFill style={{ transform: `scale(${0.97 + 0.03 * s})` }}>
+      <PaperBg tone="sand" />
+      <DrawBracket at={0} x={200} y={520} w={680} h={880} color={COLORS.burgundy} />
       <Img src={img('dar_logo_outline_olive.png')} style={{ ...box, clipPath: `inset(0 0 0 ${wipe}%)`, opacity: 1 - fill }} />
       <Img src={img('dar_logo_filled_olive.png')} style={{ ...box, opacity: fill }} />
     </AbsoluteFill>
@@ -143,13 +148,12 @@ const Logo: React.FC = () => {
 
 /* ---------- sound (sound-design-foley) ---------- */
 const FX: [string, number, number][] = [
-  ['soft_pop', 1.94, 0.45], ['soft_pop', 2.24, 0.45], ['soft_pop', 2.54, 0.45],
-  ['soft_pop', 4.33, 0.4], ['stamp_thud', 6.45, 0.35], ['stamp_thud', 6.59, 0.35], ['stamp_thud', 6.73, 0.35],
-  ['paper_unfold', 7.58, 0.55], ['paper_unfold', 7.91, 0.55], ['paper_unfold', 8.31, 0.55],
-  ['stamp_thud', 10.46, 0.4], ['stamp_thud', 10.6, 0.4], ['stamp_thud', 10.73, 0.4],
-  ['quick_whoosh', 16.61, 0.35], ['ui_bubble_pop', 16.7, 0.45], ['ui_bubble_pop', 16.86, 0.45], ['ui_bubble_pop', 17.02, 0.45],
-  ['quick_whoosh', 22.2, 0.3], ['pin_drop', 28.6, 0.5], ['pin_drop', 29.4, 0.5],
-  ['card_flip_paper', 32.45, 0.65], ['pen_tick', 33.85, 0.6], ['pen_tick', 34.75, 0.6], ['quick_whoosh', 41.16, 0.3],
+  ['quick_whoosh', 1.64, 0.3], ['soft_pop', 2.93, 0.5], ['quick_whoosh', 4.33, 0.3],
+  ['quick_whoosh', 7.70, 0.35], ['quick_whoosh', 7.97, 0.35], ['quick_whoosh', 8.23, 0.35], ['quick_whoosh', 8.50, 0.35],
+  ['quick_whoosh', 10.2, 0.4], ['soft_pop', 12.25, 0.5], ['quick_whoosh', 14.53, 0.3], ['soft_pop', 16.61, 0.5],
+  ['quick_whoosh', 19.45, 0.3], ['soft_pop', 22.67, 0.5], ['pin_drop', 28.6, 0.5], ['pin_drop', 29.4, 0.5],
+  ['card_flip_paper', 32.45, 0.65], ['soft_pop', 33.49, 0.5], ['pen_tick', 33.85, 0.6], ['pen_tick', 34.75, 0.6],
+  ['quick_whoosh', 37.26, 0.3], ['quick_whoosh', 41.16, 0.3], ['pen_tick', 44.6, 0.4],
 ];
 const SoundDesignTrack: React.FC = () => (
   <>
@@ -161,69 +165,84 @@ const SoundDesignTrack: React.FC = () => (
 );
 
 /* ---------- the film ---------- */
+const GLITCH_CUTS = [2.93, 12.25, 16.61, 22.67, 33.49].map(F);
+const STACK = (n: string) => img(n);
+
 export const DarFilm: React.FC = () => {
   const frame = useCurrentFrame();
   const rel = (a: number, b: number) => F(a) - F(b);
-  const frameOpacity = interpolate(frame, [F(41.16), F(41.16) + 18], [1, 0], clamp);
-  const outroIn = interpolate(frame, [F(41.16) - 9, F(41.16) + 9], [0, 1], clamp);
-  const logoIn = interpolate(frame, [F(44.6), F(44.6) + 12], [0, 1], clamp);
+  const outroIn = interpolate(frame, [F(41.16) - 6, F(41.16) + 6], [0, 1], clamp);
+  const logoIn = interpolate(frame, [F(44.6), F(44.6) + 8], [0, 1], clamp);
+  const fx = glitchFilter(frame, GLITCH_CUTS);
 
   return (
-    <AbsoluteFill style={{ background: COLORS.burgundy }}>
-      {/* 1 opening */}
-      <Cut from={0} to={1.64}><Shot src="open" /></Cut>
-      {/* 2 fixed-object match cuts every 9 frames */}
-      <Cut from={1.64} to={1.94}><Shot src="match1" push={0} /></Cut>
-      <Cut from={1.94} to={2.24}><Shot src="match2" push={0} /></Cut>
-      <Cut from={2.24} to={2.54}><Shot src="match3" push={0} /></Cut>
-      <Cut from={2.54} to={2.93}><Shot src="match4" /></Cut>
-      {/* 3 logo wall – shows under the PiP card until the burgundy swap */}
-      <Cut from={2.93} to={4.70}><Shot src="logodoor" rate={0.95} /></Cut>
-      {/* 4 PiP card → burgundy */}
-      <Cut from={4.33} to={7.58}><PipCard /></Cut>
-      {/* 5 stop-motion notes */}
-      <Cut from={7.58} to={11.0}>
-        <StopMotionPaper enterFrame={0} targetX={-150} targetY={-330} targetRotate={-5} width={560}><HandNote lines={['مرحبا…', 'والقلب أوسع من الدار']} /></StopMotionPaper>
-        <StopMotionPaper enterFrame={9} src={img('paper.jpg')} targetX={-200} targetY={40} targetRotate={4} width={480} />
-        <StopMotionPaper enterFrame={21} targetX={-110} targetY={420} targetRotate={-2.5} width={540}><HandNote lines={['هنا تحس', 'إنك بين أهلك']} /></StopMotionPaper>
-      </Cut>
-      {/* 6 perforated stamps */}
-      <Cut from={10.46} to={17.4}>
-        <PostageStampCard id="s1" src={img('stamp1.jpg')} enterFrame={0} exitFrame={rel(16.61, 10.46)} x={40} y={470} rotate={-6} width={340} height={430} />
-        <PostageStampCard id="s2" src={img('stamp2.jpg')} enterFrame={4} exitFrame={rel(16.61, 10.46) + 3} x={300} y={600} rotate={5} width={300} height={390} />
-        <PostageStampCard id="s3" src={img('stamp4.jpg')} enterFrame={8} exitFrame={rel(16.61, 10.46) + 6} x={120} y={960} rotate={-3} width={340} height={420} />
-      </Cut>
-      {/* 7 brand-voice cards */}
-      <Cut from={16.61} to={22.67}>
-        <div style={{ position: 'absolute', left: 30, top: 520, display: 'flex', flexDirection: 'column', gap: 40, transform: 'scale(1.3)', transformOrigin: '0 0' }}>
-          {[['مقهى دار', 'مرحبا… والقلب أوسع من الدار'], ['مقهى دار', 'كل زيارة… ضيافة وراحة'], ['مقهى دار', 'وعدٌ من أول يوم']].map(([u, c], i) => (
-            <SlideOut key={i} at={rel(22.2, 16.61) + i * 3}><div style={{ transform: 'scale(1.0)', width: 600 }}><SocialCommentCard username={u} text={c} meta="" enterFrame={3 + i * 5} /></div></SlideOut>
-          ))}
-        </div>
-      </Cut>
-      {/* 8 night montage */}
-      <Cut from={22.67} to={23.51}><Shot src="night1" /></Cut>
-      <Cut from={23.51} to={24.6}><Shot src="night2" rate={0.95} /></Cut>
-      <Cut from={24.6} to={25.94}><Shot src="night3" rate={0.64} /></Cut>
-      {/* 9 projected logo → branded map */}
-      <Cut from={25.94} to={27.4}><Shot src="project" rate={0.45} /></Cut>
-      <Cut from={27.4} to={30.48}><BrandMap /></Cut>
-      {/* 10 interior + pills → hand → 3D page curl */}
-      <Cut from={30.48} to={32.06}><Shot src="bar" rate={0.68} /></Cut>
-      <Cut from={32.06} to={32.45}><Shot src="hand" push={0} /></Cut>
-      <Cut from={32.45} to={33.49}><AbsoluteFill style={{ background: COLORS.burgundy }} /><PageCurl3D cardImageSrc={img('dar_card.png')} startFrame={-4} duration={30} scale={0.58} position={[-0.2, -0.02, 0]} /></Cut>
-      {/* 11 ink checklist */}
-      <Cut from={33.49} to={37.26}><Checklist /></Cut>
-      {/* 12 wide night + team */}
-      <Cut from={37.26} to={39.2}><Shot src="wide" rate={0.67} /></Cut>
-      <Cut from={39.2} to={41.5}><Shot src="wave" rate={0.78} /></Cut>
-      {/* 13 watercolor outro (18-frame crossfade) */}
-      <Sequence from={F(41.16) - 9} durationInFrames={F(44.6) - F(41.16) + 21}><AbsoluteFill style={{ opacity: outroIn }}><Outro /></AbsoluteFill></Sequence>
-      {/* 14 logo */}
-      <Sequence from={F(44.6)}><AbsoluteFill style={{ opacity: logoIn }}><Logo /></AbsoluteFill></Sequence>
+    <AbsoluteFill style={{ background: '#0c0a03' }}>
+      <AbsoluteFill style={{ filter: fx }}>
+        {/* 1 · sand paper, big centered words */}
+        <Cut from={0} to={1.64}><PaperBg tone="sand" /></Cut>
+        {/* 2 · rounded inset: the terrace */}
+        <Cut from={1.64} to={2.93}><Inset><Shot src="open" push={0} /></Inset></Cut>
+        {/* 3 · glitch → gold paper card */}
+        <Cut from={2.93} to={4.33}><PaperBg tone="gold" /></Cut>
+        {/* 4 · inset: branch front → pour into the Dar cup */}
+        <Cut from={4.33} to={7.58}>
+          <Inset>
+            <Sequence durationInFrames={rel(6.10, 4.33)}><Shot src="pipfront" rate={0.9} push={0} /></Sequence>
+            <Sequence from={rel(6.10, 4.33)}><Shot src="pipcup" rate={0.8} push={0} /></Sequence>
+          </Inset>
+        </Cut>
+        {/* 5–6 · sand paper: photos fly in and stack, then fly out to reveal the next words */}
+        <Cut from={7.58} to={12.25}>
+          <PaperBg tone="sand" />
+          <PhotoStack enterAt={4} gap={8} exitAt={rel(10.2, 7.58)} photos={[
+            { src: STACK('stamp1.jpg'), x: 40, y: 430, w: 420, h: 520, r: -6, from: 'right' },
+            { src: STACK('paper.jpg'), x: 150, y: 700, w: 370, h: 470, r: 5, from: 'right' },
+            { src: STACK('stamp2.jpg'), x: 40, y: 1010, w: 400, h: 500, r: -3, from: 'left' },
+            { src: STACK('stamp4.jpg'), x: 190, y: 1200, w: 340, h: 280, r: 7, from: 'right' },
+          ]} />
+        </Cut>
+        {/* 7 · glitch → dark card: «مرحبا» */}
+        <Cut from={12.25} to={14.53}><PaperBg tone="dark" /></Cut>
+        {/* 8 · inset: the Dar wall */}
+        <Cut from={14.53} to={16.61}><Inset><Shot src="logodoor" rate={0.8} push={0} /></Inset></Cut>
+        {/* 9 · glitch → gold card: «وعد» */}
+        <Cut from={16.61} to={19.45}><PaperBg tone="gold" /></Cut>
+        {/* 10 · inset: hospitality details */}
+        <Cut from={19.45} to={22.67}>
+          <Inset>
+            <Sequence durationInFrames={24}><Shot src="match1" rate={0.6} push={0} /></Sequence>
+            <Sequence from={24} durationInFrames={24}><Shot src="match2" rate={0.6} push={0} /></Sequence>
+            <Sequence from={48} durationInFrames={24}><Shot src="match4" rate={0.6} push={0} /></Sequence>
+            <Sequence from={72}><Shot src="match3" rate={0.6} push={0} /></Sequence>
+          </Inset>
+        </Cut>
+        {/* 11 · glitch → full-bleed night montage */}
+        <Cut from={22.67} to={23.51}><Shot src="night1" /></Cut>
+        <Cut from={23.51} to={24.6}><Shot src="night2" rate={0.95} /></Cut>
+        <Cut from={24.6} to={25.94}><Shot src="night3" rate={0.64} /></Cut>
+        {/* 12 · projected logo → branded map */}
+        <Cut from={25.94} to={27.4}><Shot src="project" rate={0.45} /></Cut>
+        <Cut from={27.4} to={30.48}><BrandMap /></Cut>
+        {/* 13 · bar + growing pills → hand → 3D page curl */}
+        <Cut from={30.48} to={32.06}><Shot src="bar" rate={0.68} /></Cut>
+        <Cut from={32.06} to={32.45}><Shot src="hand" push={0} /></Cut>
+        <Cut from={32.45} to={33.49}><PaperBg tone="dark" /><PageCurl3D cardImageSrc={img('dar_card.png')} startFrame={-4} duration={30} scale={0.58} position={[-0.2, -0.02, 0]} /></Cut>
+        {/* 14 · glitch → ink checklist on sand paper */}
+        <Cut from={33.49} to={37.26}><Checklist /></Cut>
+        {/* 15 · inset: wide night → team */}
+        <Cut from={37.26} to={41.3}>
+          <Inset>
+            <Sequence durationInFrames={rel(39.2, 37.26)}><Shot src="wide" rate={0.67} push={0} /></Sequence>
+            <Sequence from={rel(39.2, 37.26)}><Shot src="wave" rate={0.78} push={0} /></Sequence>
+          </Inset>
+        </Cut>
+        {/* 16 · watercolor pull-back */}
+        <Sequence from={F(41.16) - 6} durationInFrames={F(44.6) - F(41.16) + 14}><AbsoluteFill style={{ opacity: outroIn }}><Outro /></AbsoluteFill></Sequence>
+        {/* 17 · logo: bracket draws, outline → filled */}
+        <Sequence from={F(44.6)}><AbsoluteFill style={{ opacity: logoIn }}><Logo /></AbsoluteFill></Sequence>
 
-      <Captions hideBetween={[[27.4, 30.48]]} />
-      {frame < F(41.16) + 18 && <InvertedCornerFrame opacity={frameOpacity} />}
+        <Captions hideBetween={[[27.4, 30.48]]} />
+      </AbsoluteFill>
       <SoundDesignTrack />
     </AbsoluteFill>
   );

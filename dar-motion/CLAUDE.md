@@ -2,7 +2,7 @@
 
 ## Active Skills (Auto-Enforce Always)
 - `brand-frame-tokens`: Always preserve the `#EAE3D2` inverted-corner frame and Dar Cafe palette from Color Scheme.pdf (src/styles/tokens.ts). Font: Thmanyah Serif Black (user-supplied, overrides the skill default).
-- `arabic-kinetic-kashida`: Never use Unicode `ـ` stepping for animation. Always use `<DynamicKashida />` geometric stretching.
+- `arabic-kinetic-kashida`: Never step kashida by adding `ـ` characters per frame. `<DynamicKashida />` reveals a run of the font's own tatweel glyph inside a smoothly widening clip, so the stroke weight and baseline always match the letters (a drawn bar reads as a detached "-----").
 - `tactile-paper-collage`: Enforce 10fps quantization (`Math.floor(frame / 3) * 3`) on notes, perforated SVG masks on stamps, and stroke-dashoffset on checkmarks.
 - `transitions-maps-3d`: Use GLSL `<PageCurl3D />` with Dar dark-olive `#413815` reverse face for the card reveal.
 - `sound-design-foley`: Keep every visual beat locked to Foley audio (+ ducked BGM when one is supplied).
