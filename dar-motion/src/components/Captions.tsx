@@ -44,7 +44,7 @@ export const Captions: React.FC<{ hideBetween?: [number, number][] }> = ({ hideB
             return (
               <span key={i} style={{ display: 'inline-block', visibility: shown ? 'visible' : 'hidden',
                 transform: `scale(${0.86 + 0.14 * s})`, transformOrigin: '100% 60%',
-                ...(cue.pills ? { background: COLORS.burgundy, padding: '0px 22px 10px', borderRadius: 4 } : {}) }}>
+                ...(cue.pills ? { background: COLORS.terracotta, padding: '0px 22px 10px', borderRadius: 4 } : {}) }}>
                 {body}
               </span>
             );

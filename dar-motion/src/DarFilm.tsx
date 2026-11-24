@@ -123,9 +123,13 @@ const Outro: React.FC = () => {
 const Logo: React.FC = () => {
   const frame = useCurrentFrame(); const { fps } = useVideoConfig();
   const s = spring({ fps, frame, config: { damping: 20, stiffness: 90 } });
+  const wipe = interpolate(frame, [0, 26], [100, 0], { ...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const fill = interpolate(frame, [24, 40], [0, 1], clamp);
+  const box: React.CSSProperties = { position: 'absolute', width: 520, left: 280, top: 620 };
   return (
-    <AbsoluteFill style={{ background: COLORS.cream, alignItems: 'center', justifyContent: 'center' }}>
-      <Img src={img('dar_logo_navy.png')} style={{ width: 380, opacity: s, transform: `scale(${0.96 + 0.04 * s})` }} />
+    <AbsoluteFill style={{ background: COLORS.cream, transform: `scale(${0.97 + 0.03 * s})` }}>
+      <Img src={img('dar_logo_outline_olive.png')} style={{ ...box, clipPath: `inset(0 0 0 ${wipe}%)`, opacity: 1 - fill }} />
+      <Img src={img('dar_logo_filled_olive.png')} style={{ ...box, opacity: fill }} />
     </AbsoluteFill>
   );
 };
