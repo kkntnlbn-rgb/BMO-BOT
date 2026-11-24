@@ -43,7 +43,7 @@ export const CUES: Cue[] = [
     lines: ['وخلال السنة الجاية', 'نوعدكم', 'بفروع جديدة وتطور أكبر'], lineStyle: [undefined, 'pill', 'small'],
     lineSpeech: [[32.1, 33.2], [33.5, 33.95], [34.0, 35.25]], pillBg: '#2B250D', pillInk: '#D8C78E',
     kashida: [{ word: 'الجاية', right: 'الجـ', left: 'ـاية', stretch: [0, 120] }] },
-  { from: 36.2, to: 37.26, speech: [36.2, 36.8], scene: 'promise', mode: 'center', ink: '#2B250D', y: 1530, size: 120,
+  { from: 36.2, to: 37.26, speech: [36.2, 36.8], scene: 'promise', mode: 'center', y: 1500, size: 120,
     lines: ['بإذن الله'], lineStyle: ['small'] },
   { from: 37.26, to: 41.16, speech: [37.3, 40.6], lines: ['أهل النعيرية،', 'أهل الجبيل،', 'وكل من مرّ علينا…'], mode: 'top' },
 ];

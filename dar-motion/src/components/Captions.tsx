@@ -61,7 +61,7 @@ const CueView: React.FC<{ cue: Cue; frame: number }> = ({ cue, frame }) => {
             lineHeight: `${Math.round(size * 1.24)}px`, color: ink, padding: st === 'pill' ? `0 ${size * 0.28}px ${size * 0.14}px` : undefined,
             opacity: st === 'pill' ? 1 - lineOut : 1, transform: st === 'pill' ? `translateY(${-lineOut * 30}px)` : undefined,
             filter: st === 'pill' && lineOut > 0.02 ? `blur(${(lineOut * 10).toFixed(1)}px)` : undefined,
-            textShadow: onLight || st === 'pill' ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.72), 0 1px 4px rgba(0, 0, 0, 0.9)' }}>
+            textShadow: 'none' }}>
             {st === 'pill' && frame >= lineStart - 7 && (
               <div style={{ position: 'absolute', inset: 0, background: pillBg, borderRadius: 6,
                 transform: `scaleX(${Math.max(0.01, grow)})`, transformOrigin: '100% 50%' }} />

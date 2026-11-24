@@ -192,17 +192,10 @@ const PromiseScene: React.FC = () => {
       {frame >= w + 2 && (
         <>
           {hb('pr-in', inV * 80)}
-          <div style={{ position: 'absolute', left: 110, top: 520, width: 860, height: 860,
-            transform: `translateX(${(1 - inE) * 1100}px) rotate(${(-3.5 + (1 - inE) * 9 + drift * 1.2).toFixed(2)}deg) scale(${1 + drift * 0.02})`,
-            filter: inV > 0.02 ? 'url(#pr-in)' : undefined }}>
-            <StampFrame style={{ inset: 0 }}><Shot src="lounge" rate={0.55} push={0.05} /></StampFrame>
-            {[[-26, -26, 0], [834, -26, 5]].map(([x, y, d], i) => (
-              <div key={i} style={{ position: 'absolute', left: x, top: y, width: 70, height: 70, borderRadius: 35, background: '#2B250D',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${badge(d)})`, boxShadow: '0 6px 14px rgba(0,0,0,.4)' }}>
-                <Img src={img('dar_mark_olive.png')} style={{ width: 40, filter: 'brightness(3.2) sepia(.6)' }} />
-              </div>
-            ))}
-          </div>
+          <AbsoluteFill style={{ transform: `translateX(${(1 - inE) * 1100}px) rotate(${((1 - inE) * 6).toFixed(2)}deg) scale(${1 + drift * 0.04})`,
+            transformOrigin: '50% 60%', filter: inV > 0.02 ? 'url(#pr-in)' : undefined }}>
+            <Shot src="lounge" rate={0.55} push={0} />
+          </AbsoluteFill>
           <SceneCaptions scene="promise" offset={t0} only={1} />
         </>
       )}

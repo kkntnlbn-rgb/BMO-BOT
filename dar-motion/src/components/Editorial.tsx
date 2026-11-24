@@ -22,17 +22,14 @@ export const StampFrame: React.FC<{ children: React.ReactNode; style?: React.CSS
   </div>
 );
 
-/* ---------- shot inside a perforated stamp on a plain ground, slow push ---------- */
-export const Inset: React.FC<{ children: React.ReactNode; top?: number; height?: number; enter?: boolean; tone?: Tone }> = ({ children, top = 560, height = 1160, enter = true, tone = 'dark' }) => {
-  const frame = useCurrentFrame(); const { fps } = useVideoConfig();
-  const s = enter ? spring({ fps, frame, config: { damping: 26, stiffness: 90, mass: 1 } }) : 1;
+/* ---------- full-bleed shot with a slow push (captions sit on top) ---------- */
+export const Inset: React.FC<{ children: React.ReactNode; top?: number; height?: number; enter?: boolean; tone?: Tone }> = ({ children }) => {
+  const frame = useCurrentFrame();
   const push = 1 + interpolate(frame, [0, 150], [0, 0.07], clamp);
   return (
     <AbsoluteFill>
-      <PaperBg tone={tone} />
-      <StampFrame style={{ left: 110, right: 110, top, height, transform: `translateY(${(1 - s) * 120}px) rotate(${(-1.6 * s).toFixed(2)}deg) scale(${0.94 + 0.06 * s})`, opacity: Math.min(1, s * 1.6) }}>
-        <AbsoluteFill style={{ transform: `scale(${push})` }}>{children}</AbsoluteFill>
-      </StampFrame>
+      <AbsoluteFill style={{ transform: `scale(${push})` }}>{children}</AbsoluteFill>
+      <AbsoluteFill style={{ background: 'linear-gradient(rgba(20,16,4,.42) 0%, rgba(20,16,4,0) 34%)' }} />
     </AbsoluteFill>
   );
 };
