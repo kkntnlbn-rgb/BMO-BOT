@@ -6,12 +6,14 @@ interface Props {
   border?: number;
   cornerRadius?: number;
   opacity?: number;
+  color?: string;
 }
 
 export const InvertedCornerFrame: React.FC<Props> = ({
   border = 26,
   cornerRadius = 42,
   opacity = 1,
+  color = COLORS.cream,
 }) => {
   const W = VIDEO_CONFIG.width;
   const H = VIDEO_CONFIG.height;
@@ -39,7 +41,7 @@ export const InvertedCornerFrame: React.FC<Props> = ({
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
         <path
           d={`${outerPath} ${innerPath}`}
-          fill={COLORS.cream}
+          fill={color}
           fillRule="evenodd"
         />
       </svg>

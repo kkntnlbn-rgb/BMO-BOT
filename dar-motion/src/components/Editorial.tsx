@@ -9,47 +9,30 @@ const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 export const EXPO_OUT = Easing.bezier(0.16, 1, 0.3, 1);
 export const EXPO_IN = Easing.bezier(0.7, 0, 0.84, 0);
 
-/* ---------- textured grounds ---------- */
-const TONES = {
-  sand: { base: '#E4D9B8', edge: '#B9A56C', grain: 0.22 }, // light paper (Dar sand family)
-  gold: { base: '#A8933F', edge: '#4E4318', grain: 0.3 }, // Dar olive/gold paper
-  dark: { base: '#2B250D', edge: '#0c0a03', grain: 0.28 }, // Dar dark olive → black vignette
-} as const;
+/* ---------- plain grounds (solid Dar colours, no texture) ---------- */
+const TONES = { sand: '#C8B67C', gold: '#8F7E2F', dark: '#413815' } as const;
 export type Tone = keyof typeof TONES;
+export const PaperBg: React.FC<{ tone: Tone; drift?: boolean }> = ({ tone }) => <AbsoluteFill style={{ background: TONES[tone] }} />;
 
-export const PaperBg: React.FC<{ tone: Tone; drift?: boolean }> = ({ tone, drift = true }) => {
-  const frame = useCurrentFrame();
-  const t = TONES[tone];
-  const s = drift ? 1 + frame * 0.0006 : 1;
-  return (
-    <AbsoluteFill style={{ background: t.base, overflow: 'hidden' }}>
-      <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0, transform: `scale(${s})`, mixBlendMode: 'multiply', opacity: t.grain }}>
-        <filter id={`grain-${tone}`}><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={3} seed={4} /><feColorMatrix type="saturate" values="0" /></filter>
-        <rect width="100%" height="100%" filter={`url(#grain-${tone})`} />
-      </svg>
-      <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0, mixBlendMode: 'multiply', opacity: 0.35 }}>
-        <filter id={`fiber-${tone}`}><feTurbulence type="fractalNoise" baseFrequency="0.012 0.04" numOctaves={4} seed={9} /><feColorMatrix type="saturate" values="0" /></filter>
-        <rect width="100%" height="100%" filter={`url(#fiber-${tone})`} />
-      </svg>
-      <AbsoluteFill style={{ background: `radial-gradient(85% 70% at 50% 45%, transparent 45%, ${t.edge} 120%)` }} />
-    </AbsoluteFill>
-  );
-};
+/* ---------- perforated postage-stamp frame (reference) ---------- */
+export const StampFrame: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; pad?: number }> = ({ children, style, pad = 24 }) => (
+  <div style={{ position: 'absolute', padding: pad, filter: 'drop-shadow(0 18px 26px rgba(20,16,4,.45))',
+    background: 'radial-gradient(circle, transparent 9px, #F4EFE2 9.6px) -12px -12px / 24px 24px', ...style }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', outline: '3px solid #F4EFE2' }}>{children}</div>
+  </div>
+);
 
-/* ---------- rounded inset media on a dark ground, slow push ---------- */
-export const Inset: React.FC<{ children: React.ReactNode; top?: number; height?: number; enter?: boolean }> = ({ children, top = 560, height = 1180, enter = true }) => {
+/* ---------- shot inside a perforated stamp on a plain ground, slow push ---------- */
+export const Inset: React.FC<{ children: React.ReactNode; top?: number; height?: number; enter?: boolean; tone?: Tone }> = ({ children, top = 560, height = 1160, enter = true, tone = 'dark' }) => {
   const frame = useCurrentFrame(); const { fps } = useVideoConfig();
   const s = enter ? spring({ fps, frame, config: { damping: 26, stiffness: 90, mass: 1 } }) : 1;
   const push = 1 + interpolate(frame, [0, 150], [0, 0.07], clamp);
   return (
     <AbsoluteFill>
-      <PaperBg tone="dark" />
-      <div style={{ position: 'absolute', left: 90, right: 90, top, height, borderRadius: 46, overflow: 'hidden',
-        boxShadow: '0 30px 60px rgba(0,0,0,.6), 0 0 0 2px rgba(200,182,124,.15)',
-        transform: `translateY(${(1 - s) * 120}px) scale(${0.94 + 0.06 * s})`, opacity: Math.min(1, s * 1.6) }}>
+      <PaperBg tone={tone} />
+      <StampFrame style={{ left: 110, right: 110, top, height, transform: `translateY(${(1 - s) * 120}px) rotate(${(-1.6 * s).toFixed(2)}deg) scale(${0.94 + 0.06 * s})`, opacity: Math.min(1, s * 1.6) }}>
         <AbsoluteFill style={{ transform: `scale(${push})` }}>{children}</AbsoluteFill>
-        <AbsoluteFill style={{ boxShadow: 'inset 0 0 120px rgba(0,0,0,.55)' }} />
-      </div>
+      </StampFrame>
     </AbsoluteFill>
   );
 };
@@ -73,10 +56,10 @@ export const PhotoStack: React.FC<{ photos: StackPhoto[]; enterAt: number; gap?:
         const r = p.r + (1 - s) * (p.from === 'left' ? -28 : 28) - out * 22;
         const blur = Math.min(Math.abs(s - v) * 220 + out * 10, 16);
         return (
-          <div key={i} style={{ position: 'absolute', left: x, top: y, width: p.w, height: p.h, background: '#f4efe2', padding: 14,
-            boxShadow: '0 22px 40px rgba(0,0,0,.42)', transform: `rotate(${r}deg)`, filter: blur > 0.4 ? `blur(${blur.toFixed(1)}px)` : undefined }}>
+          <StampFrame key={i} pad={20} style={{ left: x, top: y, width: p.w, height: p.h, transform: `rotate(${r}deg)`,
+            filter: `drop-shadow(0 18px 26px rgba(20,16,4,.45))${blur > 0.4 ? ` blur(${blur.toFixed(1)}px)` : ''}` }}>
             <Img src={p.src} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </div>
+          </StampFrame>
         );
       })}
     </AbsoluteFill>

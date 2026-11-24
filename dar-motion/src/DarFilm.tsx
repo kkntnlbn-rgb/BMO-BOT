@@ -13,7 +13,7 @@ import { Captions, SceneCaptions } from './components/Captions';
 import { DynamicKashida } from './components/DynamicKashida';
 import { Cut, Shot } from './components/Footage';
 import { BrandMap } from './components/BrandMap';
-import { DrawBracket, glitchFilter, Inset, PaperBg, PhotoStack } from './components/Editorial';
+import { DrawBracket, glitchFilter, Inset, PaperBg, PhotoStack, StampFrame } from './components/Editorial';
 
 loadFont({ family: 'Thmanyah Serif', url: staticFile('assets/fonts/thmanyah-serif-text-black.otf'), weight: '900' });
 
@@ -195,9 +195,7 @@ const PromiseScene: React.FC = () => {
           <div style={{ position: 'absolute', left: 110, top: 520, width: 860, height: 860,
             transform: `translateX(${(1 - inE) * 1100}px) rotate(${(-3.5 + (1 - inE) * 9 + drift * 1.2).toFixed(2)}deg) scale(${1 + drift * 0.02})`,
             filter: inV > 0.02 ? 'url(#pr-in)' : undefined }}>
-            <div style={{ position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', boxShadow: '0 34px 60px rgba(30,25,8,.55)', border: '6px solid #2B250D' }}>
-              <Shot src="lounge" rate={0.55} push={0.05} />
-            </div>
+            <StampFrame style={{ inset: 0 }}><Shot src="lounge" rate={0.55} push={0.05} /></StampFrame>
             {[[-26, -26, 0], [834, -26, 5]].map(([x, y, d], i) => (
               <div key={i} style={{ position: 'absolute', left: x, top: y, width: 70, height: 70, borderRadius: 35, background: '#2B250D',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${badge(d)})`, boxShadow: '0 6px 14px rgba(0,0,0,.4)' }}>
@@ -288,6 +286,7 @@ export const DarFilm: React.FC = () => {
 
         <Captions hideBetween={[[27.4, 30.48]]} />
       </AbsoluteFill>
+      <InvertedCornerFrame color="#ECE4CC" />
       <SoundDesignTrack />
     </AbsoluteFill>
   );
