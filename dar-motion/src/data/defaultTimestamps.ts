@@ -46,6 +46,10 @@ export const CUES: Cue[] = [
   { from: 36.2, to: 37.26, speech: [36.2, 36.8], scene: 'promise', mode: 'center', y: 1500, size: 120,
     lines: ['بإذن الله'], lineStyle: ['small'] },
   { from: 37.26, to: 41.16, speech: [37.3, 40.6], lines: ['أهل النعيرية،', 'أهل الجبيل،', 'وكل من مرّ علينا…'], mode: 'side' },
+  // ending
+  { from: 41.16, to: 42.6, speech: [41.22, 41.95], scene: 'ending', mode: 'center', lines: ['يا هلا', 'وسهلا…'], size: 150 },
+  { from: 42.54, to: 44.75, speech: [42.56, 44.25], scene: 'ending', mode: 'center', y: 1585, size: 88, ink: '#C8B67C',
+    lines: ['والقلب أوسع من الدار'], kashida: [{ word: 'أوسع', right: 'أوسـ', left: 'ـع', stretch: [0, 120] }] },
 ];
 
 // outro title (brown serif) word times

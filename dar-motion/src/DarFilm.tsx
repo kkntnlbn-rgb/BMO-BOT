@@ -153,7 +153,7 @@ const FX: [string, number, number][] = [
   ['quick_whoosh', 10.2, 0.4], ['soft_pop', 12.25, 0.5], ['quick_whoosh', 14.53, 0.3], ['soft_pop', 16.61, 0.5],
   ['quick_whoosh', 19.45, 0.3], ['soft_pop', 22.67, 0.5], ['pin_drop', 28.6, 0.5], ['pin_drop', 29.4, 0.5],
   ['quick_whoosh', 32.06, 0.35], ['ui_bubble_pop', 33.4, 0.4], ['quick_whoosh', 35.6, 0.45], ['soft_pop', 36.1, 0.4], ['soft_pop', 36.27, 0.4],
-  ['quick_whoosh', 37.26, 0.3], ['quick_whoosh', 41.16, 0.3], ['pen_tick', 44.6, 0.4],
+  ['quick_whoosh', 37.26, 0.3], ['quick_whoosh', 41.16, 0.3], ['quick_whoosh', 42.5, 0.25], ['quick_whoosh', 44.6, 0.4], ['pen_tick', 45.5, 0.4],
 ];
 const SoundDesignTrack: React.FC = () => (
   <>
@@ -163,6 +163,51 @@ const SoundDesignTrack: React.FC = () => (
     ))}
   </>
 );
+
+/* ---------- ending ----------
+   1) terrace full-bleed, «يا هلا وسهلا…» big and centred
+   2) the shot glides down into a perforated stamp on plain dark olive, «والقلب أوسع من الدار» below
+   3) whip-push to sand: bracket draws, outline logo wipes in and fills, «الفناتير · الجبيل» */
+const Ending: React.FC = () => {
+  const frame = useCurrentFrame(); const { fps } = useVideoConfig();
+  const t0 = F(41.16);
+  const k = F(42.5) - t0; // shrink start
+  const g = spring({ fps, frame: frame - k, config: { damping: 28, stiffness: 70, mass: 1.1 } });
+  const L = interpolate(g, [0, 1], [0, 190]), T = interpolate(g, [0, 1], [0, 330]);
+  const W = interpolate(g, [0, 1], [1080, 700]), H = interpolate(g, [0, 1], [1920, 1000]);
+  const pad = interpolate(g, [0, 1], [0, 26]);
+  return (
+    <AbsoluteFill>
+      <PaperBg tone="dark" />
+      <div style={{ position: 'absolute', left: L, top: T, width: W, height: H, padding: pad,
+        transform: `rotate(${(-2.5 * g).toFixed(2)}deg)`, filter: g > 0.02 ? `drop-shadow(0 ${24 * g}px ${34 * g}px rgba(10,8,2,.55))` : undefined,
+        background: g > 0.02 ? 'radial-gradient(circle, transparent 9px, #F4EFE2 9.6px) -12px -12px / 24px 24px' : undefined }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', outline: g > 0.02 ? '3px solid #F4EFE2' : undefined }}>
+          <AbsoluteFill style={{ width: 1080, height: 1920, left: '50%', top: '50%', transform: `translate(-50%,-50%) scale(${interpolate(g, [0, 1], [1, 0.72])})` }}>
+            <Shot src="aerial" rate={0.6} push={0.06} />
+          </AbsoluteFill>
+        </div>
+      </div>
+      <SceneCaptions scene="ending" offset={t0} />
+    </AbsoluteFill>
+  );
+};
+
+const EndLogo: React.FC = () => {
+  const frame = useCurrentFrame(); const { fps } = useVideoConfig();
+  const s = spring({ fps, frame, config: { damping: 20, stiffness: 90 } });
+  const wipe = interpolate(frame, [4, 30], [100, 0], { ...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const fill = interpolate(frame, [28, 44], [0, 1], clamp);
+  const box: React.CSSProperties = { position: 'absolute', width: 500, left: 290, top: 600 };
+  return (
+    <AbsoluteFill style={{ transform: `scale(${0.97 + 0.03 * s})` }}>
+      <PaperBg tone="sand" />
+      <DrawBracket at={0} x={200} y={470} w={680} h={900} color="#413815" />
+      <Img src={img('dar_logo_outline_olive.png')} style={{ ...box, clipPath: `inset(0 0 0 ${wipe}%)`, opacity: 1 - fill }} />
+      <Img src={img('dar_logo_filled_olive.png')} style={{ ...box, opacity: fill }} />
+    </AbsoluteFill>
+  );
+};
 
 /* ---------- promise scene (replaces page-curl + checklist) ----------
    Gold paper. Words build exactly like the reference (feathered reveal, knock-out pill),
@@ -266,16 +311,15 @@ export const DarFilm: React.FC = () => {
         <Cut from={30.48} to={32.06} pushOut><Shot src="bar" rate={0.68} /></Cut>
         <Cut from={32.06} to={37.26} pushIn pushOut><PromiseScene /></Cut>
         {/* 15 · inset: wide night → team */}
-        <Cut from={37.26} to={41.3} pushIn>
+        <Cut from={37.26} to={41.16} pushIn pushOut>
           <Inset>
             <Sequence durationInFrames={rel(39.2, 37.26)}><Shot src="wide" rate={0.67} push={0} /></Sequence>
             <Sequence from={rel(39.2, 37.26)}><Shot src="wave" rate={0.78} push={0} /></Sequence>
           </Inset>
         </Cut>
-        {/* 16 · watercolor pull-back */}
-        <Sequence from={F(41.16) - 6} durationInFrames={F(44.6) - F(41.16) + 14}><AbsoluteFill style={{ opacity: outroIn }}><Outro /></AbsoluteFill></Sequence>
-        {/* 17 · logo: bracket draws, outline → filled */}
-        <Sequence from={F(44.6)}><AbsoluteFill style={{ opacity: logoIn }}><Logo /></AbsoluteFill></Sequence>
+        {/* 16 · ending: terrace → stamp → logo */}
+        <Cut from={41.16} to={44.6} pushIn pushOut><Ending /></Cut>
+        <Cut from={44.6} to={47.6} pushIn><EndLogo /></Cut>
 
         <Captions hideBetween={[[27.4, 30.48]]} />
       </AbsoluteFill>
