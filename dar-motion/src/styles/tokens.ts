@@ -7,15 +7,16 @@ export const VIDEO_CONFIG = {
 
 export const COLORS = {
   // Dar Cafe official palette (Color Scheme.pdf); keys kept so the skill components stay unchanged
-  cream: '#EAE3D2', // frame / paper (logo sits on light ground)
-  burgundy: '#41160B', // Dar dark brown – collage canvas, map land
-  navy: '#413815', // Dar dark olive – logo, curl back face, map sea
-  brown: '#5F4839', // Dar brown – serif slogan, sub-labels
+  // primary palette (top row of Color Scheme): #413815 · #8F7E2F · #C8B67C
+  cream: '#C8B67C', // Dar sand – frame, checklist, outro & logo ground
+  burgundy: '#413815', // Dar dark olive – collage canvas, map land
+  navy: '#41160B', // Dar dark brown – curl back face
+  brown: '#41160B', // Dar dark brown – serif slogan, sub-labels
   terracotta: '#B75F3D', // Dar terracotta – pills, accents
   olive: '#8F7E2F',
   sand: '#C8B67C',
   white: '#FFFFFF',
-  ink: '#1A1A1A',
+  ink: '#41160B',
 } as const;
 
 export const FONTS = {

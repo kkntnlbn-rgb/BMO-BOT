@@ -10,6 +10,7 @@ import { SocialCommentCard } from './components/SocialCommentCard';
 import { InkCheckmark } from './components/InkCheckmark';
 import { PageCurl3D } from './components/PageCurl3D';
 import { Captions } from './components/Captions';
+import { DynamicKashida } from './components/DynamicKashida';
 import { Cut, Shot } from './components/Footage';
 import { BrandMap } from './components/BrandMap';
 
@@ -78,10 +79,10 @@ const Checklist: React.FC = () => {
   return (
     <AbsoluteFill dir="rtl" style={{ background: COLORS.cream, fontFamily: FONTS.kinetic, fontWeight: 900, color: COLORS.ink }}>
       {items.map(([h, p], i) => (
-        <div key={i} style={{ position: 'absolute', right: 90, left: 90, top: 330 + i * 430, height: 400, borderBottom: i < 2 ? '3px solid #cbbfa6' : 'none' }}>
+        <div key={i} style={{ position: 'absolute', right: 90, left: 90, top: 330 + i * 430, height: 400, borderBottom: i < 2 ? '3px solid rgba(65,56,21,.35)' : 'none' }}>
           <div style={{ position: 'absolute', right: 0, top: 60 }}>
             {i < 2 ? <InkCheckmark startFrame={F(0.36 + i * 0.9)} duration={7} size={170} />
-              : <svg width={170} height={170} viewBox="0 0 100 100"><rect x={14} y={24} width={62} height={62} fill="none" stroke="#8D7F6B" strokeWidth={3} />
+              : <svg width={170} height={170} viewBox="0 0 100 100"><rect x={14} y={24} width={62} height={62} fill="none" stroke="#413815" strokeWidth={3} />
                   <text x={45} y={78} textAnchor="middle" fontSize={60} fill={COLORS.burgundy} fontFamily={FONTS.kinetic}
                     style={{ transform: `scale(${q})`, transformOrigin: '45px 55px' }}>؟</text></svg>}
           </div>
@@ -105,14 +106,20 @@ const Outro: React.FC = () => {
       <AbsoluteFill style={{ transform: `translateY(${ty}px) scale(${cam})`, filter: 'saturate(0.72) contrast(0.9) brightness(1.08) sepia(0.12) blur(0.6px)' }}>
         <Shot src="aerial" rate={0.6} push={0} />
       </AbsoluteFill>
-      <AbsoluteFill style={{ background: `linear-gradient(${COLORS.cream} 0%, ${COLORS.cream} 28%, rgba(234,227,210,0) 58%)` }} />
-      <AbsoluteFill style={{ background: 'radial-gradient(120% 80% at 50% 100%, rgba(234,227,210,0) 55%, rgba(234,227,210,.85) 100%)' }} />
+      <AbsoluteFill style={{ background: `linear-gradient(${COLORS.cream} 0%, ${COLORS.cream} 28%, rgba(200,182,124,0) 58%)` }} />
+      <AbsoluteFill style={{ background: 'radial-gradient(120% 80% at 50% 100%, rgba(200,182,124,0) 55%, rgba(200,182,124,.85) 100%)' }} />
       <div dir="rtl" style={{ position: 'absolute', top: 300, width: '100%', textAlign: 'center', fontFamily: FONTS.editorial,
         fontWeight: 900, color: COLORS.brown, fontSize: 112, lineHeight: '150px' }}>
         {[0, 1].map((ln) => (
           <div key={ln}>{words.filter((w) => w.line === ln).map((w, i) => {
-            const s = spring({ fps, frame: frame - (F(w.t) - t0), config: { damping: 22, stiffness: 300, mass: 0.8 } });
-            return <span key={i} style={{ display: 'inline-block', margin: '0 14px', opacity: frame >= F(w.t) - t0 ? 1 : 0, transform: `scale(${0.86 + 0.14 * s})` }}>{w.w}</span>;
+            const f0 = F(w.t) - t0;
+            const s = spring({ fps, frame: frame - f0, config: { damping: 20, stiffness: 170, mass: 0.9 } });
+            const e = interpolate(frame, [f0, f0 + 12], [0, 1], { ...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1) });
+            const body = w.w === 'أوسع'
+              ? <DynamicKashida rightPart="أوسـ" leftPart="ـع" startFrame={f0 + 2} endFrame={f0 + 22} toStretchPx={150} fontSize={112} strokeThickness={12} baselineOffsetPx={31} color={COLORS.brown} />
+              : w.w;
+            return <span key={i} style={{ display: 'inline-block', margin: '0 14px', opacity: frame >= f0 ? e : 0,
+              filter: e < 0.98 ? `blur(${((1 - e) * 14).toFixed(2)}px)` : undefined, transform: `translateY(${((1 - s) * 46).toFixed(2)}px)` }}>{body}</span>;
           })}</div>
         ))}
       </div>

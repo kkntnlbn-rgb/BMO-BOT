@@ -5,13 +5,13 @@ const { chromium } = require('playwright'); const path = require('path');
   const root = 'file://' + path.resolve(__dirname, '..', 'public/assets');
   const html = `<html dir="rtl"><style>
   @font-face{font-family:T;src:url(${root}/fonts/thmanyah-serif-text-black.otf)}
-  body{margin:0;width:1000px;height:1400px;background:#EAE3D2;font-family:T;color:#413815}
+  body{margin:0;width:1000px;height:1400px;background:#E9E0C6;font-family:T;color:#413815}
   .b{position:absolute;inset:44px;border:9px solid #413815;border-radius:26px}
   img{position:absolute;left:50%;top:110px;width:210px;transform:translateX(-50%)}
-  .s{position:absolute;top:360px;width:100%;text-align:center;font-size:52px;color:#5F4839}
-  .it{position:absolute;right:120px;left:120px;height:220px;border-bottom:3px solid #c9bfa8}
+  .s{position:absolute;top:360px;width:100%;text-align:center;font-size:52px;color:#8F7E2F}
+  .it{position:absolute;right:120px;left:120px;height:220px;border-bottom:3px solid #C8B67C}
   .it h3{margin:0;position:absolute;right:120px;top:40px;font-size:64px}
-  .it p{margin:0;position:absolute;right:120px;top:128px;font-size:40px;color:#5F4839}
+  .it p{margin:0;position:absolute;right:120px;top:128px;font-size:40px;color:#8F7E2F}
   .bx{position:absolute;right:0;top:50px;width:78px;height:78px;border:5px solid #413815;border-radius:6px}
   </style><body><div class="b"></div><img src="${root}/images/dar_mark_olive.png"><div class="s">حكاية دار</div>
   <div class="it" style="top:520px"><div class="bx"></div><h3>الفصل الأول</h3><p>النعيرية</p></div>

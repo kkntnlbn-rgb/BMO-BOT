@@ -38,17 +38,17 @@ export const BrandMap: React.FC = () => {
   const pull = interpolate(frame, [0, 28], [1.45, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const draw = (i: number) => interpolate(frame, [2 + i * 1.2, 30 + i * 1.2], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   return (
-    <AbsoluteFill style={{ background: COLORS.navy }}>
+    <AbsoluteFill style={{ background: COLORS.olive }}>
       <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{ transform: `scale(${kb * pull})`, transformOrigin: '45% 45%' }}>
         <defs>
-          <radialGradient id="vig" cx="40%" cy="50%" r="75%"><stop offset="0.6" stopColor={COLORS.burgundy} /><stop offset="1" stopColor="#260b05" /></radialGradient>
+          <radialGradient id="vig" cx="40%" cy="50%" r="75%"><stop offset="0.6" stopColor={COLORS.burgundy} /><stop offset="1" stopColor="#2a240c" /></radialGradient>
         </defs>
         <path d={COAST} fill="url(#vig)" />
         <g fill="none" stroke={COLORS.cream} strokeLinecap="round">
           {MAIN.map((d, i) => <path key={i} d={d} strokeWidth={9} opacity={0.75} pathLength={1} strokeDasharray={1} strokeDashoffset={draw(i)} />)}
           {SEC.map((d, i) => <path key={i} d={d} strokeWidth={4} opacity={0.45} pathLength={1} strokeDasharray={1} strokeDashoffset={draw(i + 4)} />)}
         </g>
-        <text x={930} y={430} textAnchor="middle" fontFamily={FONTS.kinetic} fontSize={40} fill={COLORS.sand}>الخليج العربي</text>
+        <text x={930} y={430} textAnchor="middle" fontFamily={FONTS.kinetic} fontSize={40} fill={COLORS.sand} opacity={0.9}>الخليج العربي</text>
         <Pin x={340} y={700} at={36} en="Al Nairyah" ar="النعيرية" dy={-215} />
         <Pin x={790} y={1000} at={60} en="Al Fanateer" ar="الفناتير" dy={110} />
       </svg>

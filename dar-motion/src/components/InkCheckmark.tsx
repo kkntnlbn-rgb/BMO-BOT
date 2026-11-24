@@ -28,7 +28,7 @@ export const InkCheckmark: React.FC<InkCheckmarkProps> = ({
 
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-      <rect x={14} y={24} width={62} height={62} stroke="#8D7F6B" strokeWidth={3} />
+      <rect x={14} y={24} width={62} height={62} stroke="#413815" strokeWidth={3} />
       <path
         d="M 24 54 L 44 74 C 54 52 68 32 88 12"
         stroke={COLORS.ink}
