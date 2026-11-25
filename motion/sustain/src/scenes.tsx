@@ -42,18 +42,18 @@ export const S1Start: React.FC = () => {
   const [a1] = M('s1a');
   const [b1] = M('s1b');
   return (
-    <Live t={t} t0={0} t1={6.3}>
+    <Live t={t} t0={0} t1={6.1}>
       {/* natural backdrop: the wave photo, softened and tinted into the palette */}
       <AbsoluteFill style={{overflow: 'hidden'}}>
         <Img src={staticFile('media/wave.jpg')} style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: '4% 50%', transform: `scale(${1.25 + t * 0.02})`, filter: 'blur(7px) saturate(1.1)'}} />
         <AbsoluteFill style={{background: `linear-gradient(180deg, rgba(201,236,214,.25) 0%, rgba(201,236,214,.55) 55%, ${C.yellow} 82%)`}} />
       </AbsoluteFill>
-      <Contact x={W / 2} y={1210} w={360} k={k} />
-      <div style={{position: 'absolute', left: W / 2 - 160, top: 330, transform: `translateY(${(1 - k) * 260}px) scale(${0.7 + 0.3 * k})`, opacity: Math.min(1, k * 1.5)}}>
-        <Bottle3D h={880} t={t} spin={0.22} />
+      <Contact x={W / 2} y={1180} w={380} k={k} />
+      <div style={{position: 'absolute', left: W / 2 - 207, top: 150, transform: `translateY(${(1 - k) * 260}px) scale(${0.7 + 0.3 * k})`, opacity: Math.min(1, k * 1.5)}}>
+        <Bottle3D h={1150} t={t} spin={0.22} />
       </div>
       <Caption t={t} text={c.s1[0].text} h={c.s1[0].highlight} at={a1} until={b1 - 0.15} y={1330} size={112} />
-      <Caption t={t} text={c.s1[1].text} h={c.s1[1].highlight} at={b1} until={7} y={1300} size={96} />
+      <Caption t={t} text={c.s1[1].text} h={c.s1[1].highlight} at={b1} until={6.6} y={1300} size={96} />
     </Live>
   );
 };
@@ -63,7 +63,7 @@ const FALL = Array.from({length: 18}, (_, i) => ({
   x: 60 + random('fx' + i) * 900,
   y: 1330 + random('fy' + i) * 320,
   r: -70 + random('fr' + i) * 140,
-  h: 170 + random('fh' + i) * 90,
+  h: 210 + random('fh' + i) * 110,
   d: i * 0.11,
   crushed: random('fc' + i) * 0.7,
 }));
@@ -81,7 +81,7 @@ export const S2Problem: React.FC = () => {
     {x: 910, y: 1130, s: 140},
   ];
   return (
-    <Live t={t} t0={5.7} t1={11.5}>
+    <Live t={t} t0={5.55} t1={11.15}>
       {/* the hero bottle is the first to fall */}
       {FALL.map((f, i) => {
         const st = E.fall0 + f.d;
@@ -90,7 +90,7 @@ export const S2Problem: React.FC = () => {
         const y = -400 + (f.y + 400) * easeIn(k) - (k >= 1 ? (1 - land) * 22 : 0);
         return (
           <div key={i} style={{position: 'absolute', left: f.x, top: y, transform: `rotate(${f.r * k}deg)`, opacity: t < st ? 0 : 1}}>
-            <MiniBottle h={f.h} crushed={f.crushed * land} />
+            <MiniBottle h={f.h} crushed={f.crushed * land} angle={random('fa' + i)} />
           </div>
         );
       })}
@@ -105,7 +105,7 @@ export const S2Problem: React.FC = () => {
       </div>
       <Caption t={t} text={c.s2[0].text} h={c.s2[0].highlight} at={a} until={b - 0.15} y={230} size={96} />
       <Caption t={t} text={c.s2[1].text} h={c.s2[1].highlight} at={b} until={cc - 0.15} y={230} size={96} />
-      <Caption t={t} text={c.s2[2].text} h={c.s2[2].highlight} at={cc} until={12} y={230} size={96} />
+      <Caption t={t} text={c.s2[2].text} h={c.s2[2].highlight} at={cc} until={11.6} y={230} size={96} />
     </Live>
   );
 };
@@ -124,7 +124,7 @@ export const S3Recycle: React.FC = () => {
     {x: 890, y: 1070, s: 140},
   ];
   return (
-    <Live t={t} t0={10.95} t1={15.3}>
+    <Live t={t} t0={10.55} t1={14.9}>
       {badges.map((bd, i) => (
         <div key={i} style={{position: 'absolute', left: bd.x, top: bd.y + Math.sin(t * 1.8 + i) * 10}}>
           <FlipBadge3D size={bd.s} k={1} flip={p(t, E.solved + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
@@ -138,71 +138,110 @@ export const S3Recycle: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          left: W / 2 - 110,
-          top: 380,
+          left: W / 2 - 137,
+          top: 300,
           transform: `translateY(${into * 180}px) scale(${1 - into * 0.92}) rotate(${into * 300}deg)`,
           opacity: 1 - p(t, E.bottleIntoRecycle + 0.6, 0.25),
         }}
       >
-        <Bottle3D h={600} t={t} spin={0.4} />
+        <Bottle3D h={760} t={t} spin={0.4} />
       </div>
       <div style={{position: 'absolute', left: W / 2, top: 680}}>
         <Flash t={t} at={E.bottleIntoRecycle + 0.65} size={700} />
       </div>
       <Caption t={t} text={c.s3[0].text} h={c.s3[0].highlight} at={a} until={b - 0.12} y={1210} size={120} />
       <Caption t={t} text={c.s3[1].text} h={c.s3[1].highlight} at={b} until={cc - 0.12} y={1210} size={120} />
-      <Caption t={t} text={c.s3[2].text} h={c.s3[2].highlight} at={cc} until={16} y={1180} size={100} />
+      <Caption t={t} text={c.s3[2].text} h={c.s3[2].highlight} at={cc} until={15.4} y={1180} size={100} />
     </Live>
   );
 };
 
-/* ── S4 15–22s: the bottle transforms into new products — with the requested shine ── */
+/* ── S4: «طريقة التحوّل البصري» — the bottle bursts into the PDF's step-by-step guides,
+   then each guide resolves into its finished product, with flashes and the requested shine ── */
+const GUIDES = ['media/guide-vase.jpg', 'media/guide-organizer.jpg', 'media/guide-pens.jpg', 'media/guide-basket.jpg'];
+const GUIDE_FAN = [
+  {x: -250, y: -150, r: -9},
+  {x: 250, y: -170, r: 8},
+  {x: -230, y: 210, r: 7},
+  {x: 240, y: 190, r: -7},
+];
 const PRODUCTS = [
-  {src: 'media/vase.jpg', slot: {x: 690, y: 1240, s: 0.5}},
-  {src: 'media/pens.jpg', slot: {x: 390, y: 1240, s: 0.5}},
-  {src: 'media/basket.jpg', slot: {x: 90, y: 1240, s: 0.5}},
+  {src: 'media/vase.jpg', slot: {x: 135, y: 1395}},
+  {src: 'media/organizer.jpg', slot: {x: 405, y: 1395}},
+  {src: 'media/pens.jpg', slot: {x: 675, y: 1395}},
+  {src: 'media/basket.jpg', slot: {x: 945, y: 1395}},
 ];
 const PW = 560;
 const PH = 600;
+const SLOT_S = 0.42;
+const CX = W / 2;
+const CY = 720;
 
 export const S4Transform: React.FC = () => {
   const t = useT();
   const c = useCfg();
   const [a, b] = [M('s4a')[0], M('s4b')[0]];
-  const first = E.products[0];
-  const bottleGone = p(t, first, 0.35, easeInOut);
+  const burst = p(t, E.bottleBurst, 0.45, easeInOut);
+  const gOut = p(t, E.guidesOut, 0.5, easeInOut);
   return (
-    <Live t={t} t0={14.7} t1={22.3}>
+    <Live t={t} t0={14.3} t1={21.55}>
       {/* ambient shine across the whole scene */}
-      <Sparkles t={t} at={15.0} n={22} w={W} h={H} seed="amb" />
-      {/* the hero bottle, turning, until it becomes the first product */}
-      <div style={{position: 'absolute', left: W / 2 - 126, top: 380, transform: `scale(${1 - bottleGone}) rotate(${bottleGone * 120}deg)`, opacity: 1 - bottleGone}}>
-        <Bottle3D h={700} t={t} spin={0.5} />
+      <Sparkles t={t} at={14.6} n={26} w={W} h={H} seed="amb" />
+      {/* the hero bottle turns, then bursts into light */}
+      <div style={{position: 'absolute', left: CX - 171, top: CY - 475, transform: `scale(${1 + burst * 0.35})`, opacity: 1 - burst, filter: `blur(${burst * 14}px) brightness(${1 + burst * 1.5})`}}>
+        <Bottle3D h={950} t={t} spin={0.55} />
       </div>
+      <div style={{position: 'absolute', left: CX, top: CY}}>
+        <Flash t={t} at={E.bottleBurst + 0.1} size={1100} />
+      </div>
+      {/* the how-to guides from the brief fan out — the "visual transformation" step */}
+      {GUIDES.map((g, i) => {
+        const k = p(t, E.guides[i], 0.65, backOut);
+        const fan = GUIDE_FAN[i];
+        const w = 470;
+        const h = 330;
+        return (
+          <div
+            key={g}
+            style={{
+              position: 'absolute',
+              left: CX - w / 2 + fan.x * k,
+              top: CY - h / 2 + fan.y * k - gOut * 260,
+              transform: `scale(${(0.3 + 0.7 * k) * (1 - gOut * 0.5)}) rotate(${fan.r * k}deg)`,
+              opacity: (t < E.guides[i] ? 0 : 1) * (1 - gOut),
+              filter: `blur(${gOut * 8}px)`,
+            }}
+          >
+            <PhotoCard src={g} w={w} h={h} fit="cover" />
+          </div>
+        );
+      })}
+      {/* each guide resolves into its finished product */}
       {PRODUCTS.map((pr, i) => {
         const at = E.products[i];
-        const pop = p(t, at + 0.1, 0.7, backOut);
-        const next = i < 2 ? p(t, E.products[i + 1] - 0.05, 0.6, easeInOut) : 0;
-        const x = interpolate(next, [0, 1], [(W - PW) / 2, pr.slot.x - (PW * (1 - pr.slot.s)) / 2]);
-        const y = interpolate(next, [0, 1], [380, pr.slot.y - (PH * (1 - pr.slot.s)) / 2]);
-        const s = interpolate(next, [0, 1], [1, pr.slot.s]) * pop;
-        const tagK = p(t, at + 0.35, 0.45);
+        const pop = p(t, at + 0.08, 0.7, backOut);
+        const next = i < PRODUCTS.length - 1 ? p(t, E.products[i + 1] - 0.05, 0.55, easeInOut) : p(t, at + 0.75, 0.55, easeInOut);
+        const x = interpolate(next, [0, 1], [CX - PW / 2, pr.slot.x - PW / 2]);
+        const y = interpolate(next, [0, 1], [CY - PH / 2, pr.slot.y - PH / 2]);
+        const s = interpolate(next, [0, 1], [1, SLOT_S]) * pop;
+        const tagK = p(t, at + 0.3, 0.45);
         return (
-          <div key={i} style={{position: 'absolute', left: x, top: y, width: PW, height: PH, transform: `scale(${s}) rotate(${(1 - pop) * -10 + (i - 1) * 1.5}deg)`, opacity: t < at ? 0 : 1}}>
+          <div key={i} style={{position: 'absolute', left: x, top: y, width: PW, height: PH, transform: `scale(${s}) rotate(${(1 - pop) * -10 + (i % 2 ? 2 : -2) * next}deg)`, opacity: t < at ? 0 : 1}}>
             <PhotoCard src={pr.src} w={PW} h={PH} fit="cover" />
             <div
               dir="rtl"
               style={{
                 position: 'absolute',
                 left: '50%',
-                bottom: -46,
-                transform: `translateX(-50%) scale(${0.6 + 0.4 * tagK})`,
+                bottom: -54,
+                transform: `translateX(-50%) scale(${(0.6 + 0.4 * tagK) * (1 + next * 0.75)})`,
+                transformOrigin: '50% 0%',
                 opacity: tagK,
                 background: C.brown,
                 color: C.yellow,
                 fontFamily: 'Thmanyah Serif',
                 fontWeight: 900,
-                fontSize: next > 0.5 ? 64 : 58,
+                fontSize: 58,
                 padding: '6px 34px 14px',
                 borderRadius: 22,
                 whiteSpace: 'nowrap',
@@ -217,18 +256,18 @@ export const S4Transform: React.FC = () => {
       {/* transformation flashes + sparkle bursts */}
       {E.products.map((at, i) => (
         <React.Fragment key={i}>
-          <div style={{position: 'absolute', left: W / 2, top: 680}}>
+          <div style={{position: 'absolute', left: CX, top: CY}}>
             <Flash t={t} at={at} size={900} />
           </div>
           {t > at && t < at + 1.2 && (
-            <div style={{position: 'absolute', left: W / 2 - 360, top: 330, width: 720, height: 720}}>
-              <Sparkles t={t} at={at} n={12} w={720} h={720} seed={'b' + i} burst={0.3 * (1 - p(t, at, 1.0))} />
+            <div style={{position: 'absolute', left: CX - 380, top: CY - 380, width: 760, height: 760}}>
+              <Sparkles t={t} at={at} n={14} w={760} h={760} seed={'b' + i} burst={0.35 * (1 - p(t, at, 1.0))} />
             </div>
           )}
         </React.Fragment>
       ))}
-      <Caption t={t} text={c.s4[0].text} h={c.s4[0].highlight} at={a} until={b - 0.12} y={190} size={96} />
-      <Caption t={t} text={c.s4[1].text} h={c.s4[1].highlight} at={b} until={22.5} y={190} size={90} />
+      <Caption t={t} text={c.s4[0].text} h={c.s4[0].highlight} at={a} until={b - 0.12} y={150} size={96} />
+      <Caption t={t} text={c.s4[1].text} h={c.s4[1].highlight} at={b} until={21.8} y={150} size={88} />
     </Live>
   );
 };

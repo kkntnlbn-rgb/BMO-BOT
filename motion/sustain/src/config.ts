@@ -11,7 +11,7 @@ export const schema = z.object({
   s2: z.array(cap).length(3).describe('المشهد 2: المشكلة'),
   s3: z.array(cap).length(3).describe('المشهد 3: الحل'),
   s4: z.array(cap).length(2).describe('المشهد 4: التحوّل'),
-  products: z.array(z.string()).length(3).describe('المشهد 4: أسماء المنتجات'),
+  products: z.array(z.string()).length(4).describe('المشهد 4: أسماء المنتجات'),
   s5: z.array(cap).length(4).describe('المشهد 5: الختام'),
   voVolume: z.number().min(0).max(2).step(0.05).describe('صوت التعليق'),
   musicVolume: z.number().min(0).max(2).step(0.05).describe('الموسيقى الهادئة'),
@@ -41,7 +41,7 @@ export const defaults: Cfg = {
     {text: 'من زجاجةٍ مستهلَكة', highlight: ''},
     {text: 'إلى منتجاتٍ جديدةٍ ومفيدة', highlight: 'ومفيدة'},
   ],
-  products: ['لجمالِ المنزل', 'لتنظيمِ المكتب', 'لهدايا الأطفال'],
+  products: ['لجمالِ المنزل', 'وتنظيمِه', 'لتنظيمِ المكتب', 'لهدايا الأطفال'],
   s5: [
     {text: 'لا تجعلْ زجاجتَك \n نهايةَ قصّة', highlight: ''},
     {text: 'بل بدايةً جديدة', highlight: 'جديدة'},

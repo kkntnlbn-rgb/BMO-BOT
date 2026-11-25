@@ -4,73 +4,25 @@ import {Extrude} from './fx';
 import {C, p, backOut} from './theme';
 
 /**
- * The hero: a transparent 3D water bottle. Rotation is faked the way a turntable
- * render looks — highlights and label slide across the body while the silhouette breathes.
+ * The hero: a real 3D bottle (Three.js lathe + clear-PET material, see three/BottleSpin.tsx),
+ * pre-rendered as a 240-frame transparent turntable and played back at any speed.
  */
-export const Bottle3D: React.FC<{h: number; t: number; spin?: number; tilt?: number; style?: React.CSSProperties}> = ({h, t, spin = 0.5, tilt = 0, style}) => {
-  const a = t * spin * Math.PI * 2; // turntable angle
-  const sx = 0.92 + 0.08 * Math.abs(Math.cos(a)); // silhouette breathing
-  const hl = Math.sin(a); // -1..1 highlight travel
-  const w = h * 0.36;
+const frameSrc = (i: number) => staticFile(`bottle/element-${String(((i % 240) + 240) % 240).padStart(3, '0')}.webp`);
+export const Bottle3D: React.FC<{h: number; t: number; spin?: number; tilt?: number; phase?: number; style?: React.CSSProperties}> = ({h, t, spin = 0.5, tilt = 0, phase = 0, style}) => {
+  const idx = Math.floor((t * spin + phase) * 240);
+  const iw = h * 0.6;
   return (
-    <div style={{position: 'relative', width: w, height: h, transform: `rotate(${tilt}deg) scaleX(${sx})`, filter: 'drop-shadow(0 30px 40px rgba(14,77,59,.35))', ...style}}>
-      <svg viewBox="0 0 100 280" width={w} height={h} style={{overflow: 'visible'}}>
-        <defs>
-          <linearGradient id="bodyG" x1="0" x2="1">
-            <stop offset="0" stopColor="#9fd6f2" stopOpacity="0.75" />
-            <stop offset={0.5 + hl * 0.3} stopColor="#ffffff" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#5fb3e0" stopOpacity="0.8" />
-          </linearGradient>
-          <linearGradient id="waterG" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#7cc8ee" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#2b8fd0" stopOpacity="0.75" />
-          </linearGradient>
-          <clipPath id="bodyClip">
-            <path d="M38 30 L62 30 L62 46 Q86 62 86 96 L86 262 Q86 276 72 276 L28 276 Q14 276 14 262 L14 96 Q14 62 38 46 Z" />
-          </clipPath>
-        </defs>
-        {/* cap */}
-        <rect x="34" y="2" width="32" height="28" rx="5" fill={C.blue} />
-        <rect x="34" y="2" width="32" height="7" rx="3" fill="#59bdf0" />
-        {[0, 1, 2, 3, 4].map((i) => (
-          <rect key={i} x={37 + i * 6 + hl * 2} y="11" width="2.4" height="16" fill={C.blueDeep} opacity="0.55" />
-        ))}
-        <g clipPath="url(#bodyClip)">
-          <rect x="0" y="0" width="100" height="280" fill="url(#bodyG)" />
-          {/* water with a gentle slosh */}
-          <path d={`M0 ${120 + Math.sin(t * 3) * 3} Q 50 ${112 + Math.cos(t * 3) * 5} 100 ${120 - Math.sin(t * 3) * 3} L100 280 L0 280 Z`} fill="url(#waterG)" />
-          {/* ribs */}
-          {[150, 175, 200, 225].map((y) => (
-            <path key={y} d={`M0 ${y} Q50 ${y + 6} 100 ${y}`} stroke="#ffffff" strokeOpacity="0.45" strokeWidth="2.2" fill="none" />
-          ))}
-          {/* label wraps around and slides with the turn */}
-          <g transform={`translate(${hl * 26} 0)`} opacity={0.55 + 0.45 * Math.cos(a) ** 2}>
-            <rect x="10" y="98" width="80" height="40" fill="#ffffff" opacity="0.85" />
-            <path d="M30 118 q10 -14 20 0 q10 14 20 0" stroke={C.leaf} strokeWidth="4" fill="none" strokeLinecap="round" />
-          </g>
-          {/* specular streaks */}
-          <rect x={22 + hl * 30} y="40" width="7" height="230" rx="3.5" fill="#fff" opacity="0.7" />
-          <rect x={34 + hl * 30} y="60" width="3" height="200" rx="1.5" fill="#fff" opacity="0.45" />
-        </g>
-        <path d="M38 30 L62 30 L62 46 Q86 62 86 96 L86 262 Q86 276 72 276 L28 276 Q14 276 14 262 L14 96 Q14 62 38 46 Z" fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="1.6" />
-      </svg>
+    <div style={{position: 'relative', width: h * 0.36, height: h, transform: `rotate(${tilt}deg)`, filter: 'drop-shadow(0 30px 40px rgba(14,77,59,.30))', ...style}}>
+      <Img src={frameSrc(idx)} style={{position: 'absolute', left: -(iw - h * 0.36) / 2, top: 0, width: iw, height: h}} />
     </div>
   );
 };
 
-/** Small flat bottle used for the falling pile */
-export const MiniBottle: React.FC<{h: number; crushed?: number}> = ({h, crushed = 0}) => (
-  <svg viewBox="0 0 100 280" width={h * 0.36} height={h} style={{overflow: 'visible'}}>
-    <rect x="34" y="2" width="32" height="28" rx="5" fill={C.blue} />
-    <path
-      d={`M38 30 L62 30 L62 46 Q${86 - crushed * 10} 62 ${86 - crushed * 14} 96 L${86 - crushed * 6} 262 Q86 276 72 276 L28 276 Q14 276 ${14 + crushed * 8} 262 L${14 + crushed * 12} 96 Q14 62 38 46 Z`}
-      fill="#bfe6f7"
-      fillOpacity="0.8"
-      stroke="#ffffff"
-      strokeWidth="2"
-    />
-    <rect x="22" y="60" width="6" height="190" rx="3" fill="#fff" opacity="0.7" />
-  </svg>
+/** Pile bottles reuse the 3D render at different angles (squashed a little as they land) */
+export const MiniBottle: React.FC<{h: number; crushed?: number; angle?: number}> = ({h, crushed = 0, angle = 0}) => (
+  <div style={{width: h * 0.36, height: h, transform: `scaleX(${1 - crushed * 0.18}) scaleY(${1 - crushed * 0.08})`}}>
+    <Img src={frameSrc(Math.floor(angle * 240))} style={{marginLeft: -h * 0.12, width: h * 0.6, height: h}} />
+  </div>
 );
 
 /** 3D recycling symbol: the PDF's icon extruded into a solid, spinning badge */
