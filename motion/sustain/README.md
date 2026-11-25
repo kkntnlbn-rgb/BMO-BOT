@@ -1,6 +1,6 @@
 # الاستدامة — رحلة زجاجة الماء (Remotion)
 
-University awareness film, 9:16, 1080×1920, 60fps, **exactly 30.000s**. Same motion system as
+University awareness film, 9:16, 1080×1920, 60fps, **exactly 35.000s**. Same motion system as
 `../loh` and `../saiqal`: one continuous camera pan per hand-off, shutter motion blur,
 word-by-word RTL captions with highlight boxes, layered-extrusion 3D objects, live camera drift.
 Palette: mint `#c9ecd6`, deep green `#0e4d3b`, water blue `#2b9fd8`. Font: Thmanyah Serif Black.
@@ -30,5 +30,5 @@ npx remotion render Sustain out/sustainability.mp4
 | 22–30 | Camera widens from a card to the full landscape; Vision 2030 close | لا تجعلْ زجاجتَك نهايةَ قصّة… رؤيةَ السعوديّة ٢٠٣٠ |
 
 Voice-over: ElevenLabs "Abdulrahman" (`public/media/vo-abdulrahman.mp3`); pauses tightened and
-tempo ×1.17 into `vo.wav` (28.3s). Phrase timings: `src/vo-marks.json`; all cues: `src/timing.ts`.
+tempo ×1.03 into `vo.wav` (33.4s). Phrase timings: `src/vo-marks.json`; all cues: `src/timing.ts`.
 Images come from the project brief PDF.

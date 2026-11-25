@@ -3,7 +3,7 @@ import {AbsoluteFill, Img, interpolate, random, staticFile} from 'remotion';
 import {Contact, FlipBadge3D, Words} from './fx';
 import {Bottle3D, Flash, MiniBottle, PhotoCard, Recycle3D, Sparkles} from './elements';
 import {C, H, W, backOut, easeInOut, p, useT} from './theme';
-import {E, M} from './timing';
+import {B, E, M} from './timing';
 import {Cfg, defaults} from './config';
 
 export const CfgCtx = createContext<Cfg>(defaults);
@@ -42,7 +42,7 @@ export const S1Start: React.FC = () => {
   const [a1] = M('s1a');
   const [b1] = M('s1b');
   return (
-    <Live t={t} t0={0} t1={6.1}>
+    <Live t={t} t0={0} t1={B[1] + 0.3}>
       {/* natural backdrop: the wave photo, softened and tinted into the palette */}
       <AbsoluteFill style={{overflow: 'hidden'}}>
         <Img src={staticFile('media/wave.jpg')} style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: '4% 50%', transform: `scale(${1.25 + t * 0.02})`, filter: 'blur(7px) saturate(1.1)'}} />
@@ -53,7 +53,7 @@ export const S1Start: React.FC = () => {
         <Bottle3D h={1150} t={t} spin={0.22} />
       </div>
       <Caption t={t} text={c.s1[0].text} h={c.s1[0].highlight} at={a1} until={b1 - 0.15} y={1330} size={112} />
-      <Caption t={t} text={c.s1[1].text} h={c.s1[1].highlight} at={b1} until={6.6} y={1300} size={96} />
+      <Caption t={t} text={c.s1[1].text} h={c.s1[1].highlight} at={b1} until={B[1] + 0.6} y={1300} size={96} />
     </Live>
   );
 };
@@ -81,7 +81,7 @@ export const S2Problem: React.FC = () => {
     {x: 910, y: 1130, s: 140},
   ];
   return (
-    <Live t={t} t0={5.55} t1={11.15}>
+    <Live t={t} t0={B[1] - 0.3} t1={B[2] + 0.3}>
       {/* the hero bottle is the first to fall */}
       {FALL.map((f, i) => {
         const st = E.fall0 + f.d;
@@ -105,7 +105,7 @@ export const S2Problem: React.FC = () => {
       </div>
       <Caption t={t} text={c.s2[0].text} h={c.s2[0].highlight} at={a} until={b - 0.15} y={230} size={96} />
       <Caption t={t} text={c.s2[1].text} h={c.s2[1].highlight} at={b} until={cc - 0.15} y={230} size={96} />
-      <Caption t={t} text={c.s2[2].text} h={c.s2[2].highlight} at={cc} until={11.6} y={230} size={96} />
+      <Caption t={t} text={c.s2[2].text} h={c.s2[2].highlight} at={cc} until={B[2] + 0.6} y={230} size={96} />
     </Live>
   );
 };
@@ -124,7 +124,7 @@ export const S3Recycle: React.FC = () => {
     {x: 890, y: 1070, s: 140},
   ];
   return (
-    <Live t={t} t0={10.55} t1={14.9}>
+    <Live t={t} t0={B[2] - 0.3} t1={B[3] + 0.3}>
       {badges.map((bd, i) => (
         <div key={i} style={{position: 'absolute', left: bd.x, top: bd.y + Math.sin(t * 1.8 + i) * 10}}>
           <FlipBadge3D size={bd.s} k={1} flip={p(t, E.solved + i * 0.12, 0.7, easeInOut)} t={t} seed={i} />
@@ -151,7 +151,7 @@ export const S3Recycle: React.FC = () => {
       </div>
       <Caption t={t} text={c.s3[0].text} h={c.s3[0].highlight} at={a} until={b - 0.12} y={1210} size={120} />
       <Caption t={t} text={c.s3[1].text} h={c.s3[1].highlight} at={b} until={cc - 0.12} y={1210} size={120} />
-      <Caption t={t} text={c.s3[2].text} h={c.s3[2].highlight} at={cc} until={15.4} y={1180} size={100} />
+      <Caption t={t} text={c.s3[2].text} h={c.s3[2].highlight} at={cc} until={B[3] + 0.6} y={1180} size={100} />
     </Live>
   );
 };
@@ -184,9 +184,9 @@ export const S4Transform: React.FC = () => {
   const burst = p(t, E.bottleBurst, 0.45, easeInOut);
   const gOut = p(t, E.guidesOut, 0.5, easeInOut);
   return (
-    <Live t={t} t0={14.3} t1={21.55}>
+    <Live t={t} t0={B[3] - 0.3} t1={B[4] + 0.3}>
       {/* ambient shine across the whole scene */}
-      <Sparkles t={t} at={14.6} n={26} w={W} h={H} seed="amb" />
+      <Sparkles t={t} at={B[3]} n={26} w={W} h={H} seed="amb" />
       {/* the hero bottle turns, then bursts into light */}
       <div style={{position: 'absolute', left: CX - 171, top: CY - 475, transform: `scale(${1 + burst * 0.35})`, opacity: 1 - burst, filter: `blur(${burst * 14}px) brightness(${1 + burst * 1.5})`}}>
         <Bottle3D h={950} t={t} spin={0.55} />
@@ -267,7 +267,7 @@ export const S4Transform: React.FC = () => {
         </React.Fragment>
       ))}
       <Caption t={t} text={c.s4[0].text} h={c.s4[0].highlight} at={a} until={b - 0.12} y={150} size={96} />
-      <Caption t={t} text={c.s4[1].text} h={c.s4[1].highlight} at={b} until={21.8} y={150} size={88} />
+      <Caption t={t} text={c.s4[1].text} h={c.s4[1].highlight} at={b} until={B[4] + 0.6} y={150} size={88} />
     </Live>
   );
 };
@@ -300,7 +300,7 @@ export const S5Close: React.FC = () => {
         <Img src={staticFile('media/landscape.jpg')} style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: '45% 60%', transform: `scale(${zoom})`}} />
         <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(6,40,30,0) 30%, rgba(6,40,30,.55) 62%, rgba(6,40,30,.85) 100%)', opacity: wk}} />
       </div>
-      <Sparkles t={t} at={22.4} n={16} w={W} h={H * 0.6} seed="fin" />
+      <Sparkles t={t} at={B[4] + 0.4} n={16} w={W} h={H * 0.6} seed="fin" />
       <Caption t={t} text={c.s5[0].text} h={c.s5[0].highlight} at={a} until={b - 0.12} y={1260} size={96} color={C.cream} />
       <Caption t={t} text={c.s5[1].text} h={c.s5[1].highlight} at={b} until={cc - 0.12} y={1290} size={104} color={C.cream} />
       <Caption t={t} text={c.s5[2].text} h={c.s5[2].highlight} at={cc} until={d - 0.12} y={1290} size={110} color={C.cream} />
