@@ -33,24 +33,20 @@ const wordTimes = (cue: Cue) => {
 };
 
 const Word: React.FC<{t: number; at: number; text: string; cue: Cue; glow?: string}> = ({t, at, text, cue, glow}) => {
-  const k = p(t, at - 0.05, 0.5, easeOut);
+  // LOH reveal: each whole word wipes in from its right edge, rising 26px and de-blurring (0.55s expo-out)
+  const k = p(t, at, 0.55, easeOut);
   const kd = cue.kashida?.find((x) => x.word === text);
   const px = kd ? interpolate(p(t, at + 0.15, 0.9, easeInOut), [0, 1], [kd.stretch[0], kd.stretch[1]]) : 0;
-  // reveal from the right with a feathered edge, de-blur while rising
-  const edge = (1 - k) * 120;
   return (
     <span
       style={{
         display: 'inline-block',
-        // pad the masked box so ascenders/descenders (ي ة ه tails) and the glow are never clipped
-        padding: '0.22em 0.08em 0.42em',
-        margin: '-0.22em -0.08em -0.42em',
+        clipPath: `inset(-60% 0 -70% ${(1 - k) * 100}%)`,
+        transform: `translateY(${(1 - k) * 26}px)`,
+        filter: `blur(${(1 - k) * 8}px)`,
+        opacity: 0.2 + 0.8 * k,
         textShadow: glow,
-        WebkitMaskImage: `linear-gradient(270deg, #000 ${100 - edge}%, transparent ${130 - edge}%)`,
-        maskImage: `linear-gradient(270deg, #000 ${100 - edge}%, transparent ${130 - edge}%)`,
-        transform: `translateY(${(1 - k) * 34}px)`,
-        filter: `blur(${(1 - k) * 9}px)`,
-        opacity: k > 0 ? 1 : 0,
+        visibility: t < at ? 'hidden' : 'visible',
       }}
     >
       {kd ? <Kashida right={kd.right} left={kd.left} px={px} /> : text}
@@ -61,7 +57,7 @@ const Word: React.FC<{t: number; at: number; text: string; cue: Cue; glow?: stri
 const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
   if (t < cue.from - 0.1 || t > cue.to + 0.5) return null;
   const times = wordTimes(cue);
-  const out = p(t, cue.to - 0.18, 0.4, easeInOut); // exit upward with blur
+  const out = p(t, cue.to - 0.2, 0.4, easeInOut); // LOH exit: lift 60px, fade, blur 6
   const side = cue.mode === 'side' || (!cue.mode && !cue.pills);
   const size = cue.size ?? (side ? 104 : 124);
   const ink = cue.ink ?? C.white;
@@ -75,8 +71,8 @@ const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
         top: y,
         right: side || cue.pills ? 64 : 70,
         left: side || cue.pills ? 120 : 70,
-        transform: `translateY(-50%) translateY(${-out * 90}px)`,
-        filter: `blur(${out * 10}px)`,
+        transform: `translateY(-50%) translateY(${-out * 60}px)`,
+        filter: `blur(${out * 6}px)`,
         opacity: 1 - out,
         display: 'flex',
         flexDirection: 'column',

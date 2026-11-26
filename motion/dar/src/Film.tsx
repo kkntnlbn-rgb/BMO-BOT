@@ -107,24 +107,5 @@ export const Film: React.FC<{blur?: number}> = ({blur = 5}) => (
     <TicketFrame />
 
     <Audio src={staticFile('media/vo.mp3')} />
-    {/* foley locked to the visual beats */}
-    {CH.filter((c) => c.in === 'push-left' || c.in === 'push-up').map((c) => (
-      <Sfx key={'w' + c.t0} at={c.t0 - 0.3} src="sfx/quick_whoosh.wav" vol={0.35} />
-    ))}
-    {CH.filter((c) => c.in === 'flash').map((c) => (
-      <Sfx key={'f' + c.t0} at={c.t0 - 0.08} src="sfx/soft_pop.wav" vol={0.3} len={0.5} />
-    ))}
-    {[7.62, 7.9, 8.2, 8.5].map((t) => (
-      <Sfx key={'s' + t} at={t + 0.25} src="sfx/stamp_thud.wav" vol={0.45} len={0.6} />
-    ))}
-    <Sfx at={10.15} src="sfx/card_flip_paper.wav" vol={0.35} />
-    {[27.85, 29.45, 34.2, 34.45, 34.7].map((t) => (
-      <Sfx key={'p' + t} at={t + 0.25} src="sfx/pin_drop.wav" vol={0.4} len={0.6} />
-    ))}
-    {[30.5, 30.9, 31.3].map((t) => (
-      <Sfx key={'b' + t} at={t} src="sfx/ui_bubble_pop.wav" vol={0.3} len={0.4} />
-    ))}
-    <Sfx at={42.9} src="sfx/paper_unfold.wav" vol={0.35} />
-    <Sfx at={44.65} src="sfx/pen_tick.wav" vol={0.35} />
   </AbsoluteFill>
 );
