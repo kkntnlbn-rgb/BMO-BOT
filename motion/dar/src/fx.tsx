@@ -72,7 +72,7 @@ export const Montage: React.FC<{ids: number[]; t0: number; t1: number; o: number
     <AbsoluteFill>
       {inner}
       {/* soft right-side falloff so white captions read without a text shadow */}
-      {shade && <AbsoluteFill style={{background: 'linear-gradient(270deg, rgba(20,16,4,.55) 0%, rgba(20,16,4,.22) 50%, rgba(20,16,4,0) 78%)'}} />}
+      {shade && <AbsoluteFill style={{background: 'linear-gradient(270deg, rgba(20,16,4,.45) 0%, rgba(20,16,4,.15) 48%, rgba(20,16,4,0) 75%)'}} />}
     </AbsoluteFill>
   );
 };

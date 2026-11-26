@@ -65,7 +65,7 @@ const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
   const side = cue.mode === 'side' || (!cue.mode && !cue.pills);
   const size = cue.size ?? (side ? 104 : 124);
   const ink = cue.ink ?? C.white;
-  const glow = ink === C.white && side ? '0 0 26px rgba(18,14,4,.55), 0 0 8px rgba(18,14,4,.35)' : undefined;
+  const glow = ink === C.white && side ? '0 0 22px rgba(18,14,4,.3), 0 0 6px rgba(18,14,4,.16)' : undefined;
   const y = cue.y ?? (side ? 960 : 900);
   return (
     <div
