@@ -32,7 +32,7 @@ const wordTimes = (cue: Cue) => {
   }));
 };
 
-const Word: React.FC<{t: number; at: number; text: string; cue: Cue}> = ({t, at, text, cue}) => {
+const Word: React.FC<{t: number; at: number; text: string; cue: Cue; glow?: string}> = ({t, at, text, cue, glow}) => {
   const k = p(t, at - 0.05, 0.5, easeOut);
   const kd = cue.kashida?.find((x) => x.word === text);
   const px = kd ? interpolate(p(t, at + 0.15, 0.9, easeInOut), [0, 1], [kd.stretch[0], kd.stretch[1]]) : 0;
@@ -42,6 +42,10 @@ const Word: React.FC<{t: number; at: number; text: string; cue: Cue}> = ({t, at,
     <span
       style={{
         display: 'inline-block',
+        // pad the masked box so ascenders/descenders (ي ة ه tails) and the glow are never clipped
+        padding: '0.22em 0.08em 0.42em',
+        margin: '-0.22em -0.08em -0.42em',
+        textShadow: glow,
         WebkitMaskImage: `linear-gradient(270deg, #000 ${100 - edge}%, transparent ${130 - edge}%)`,
         maskImage: `linear-gradient(270deg, #000 ${100 - edge}%, transparent ${130 - edge}%)`,
         transform: `translateY(${(1 - k) * 34}px)`,
@@ -61,6 +65,7 @@ const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
   const side = cue.mode === 'side' || (!cue.mode && !cue.pills);
   const size = cue.size ?? (side ? 104 : 124);
   const ink = cue.ink ?? C.white;
+  const glow = ink === C.white && side ? '0 0 26px rgba(18,14,4,.55), 0 0 8px rgba(18,14,4,.35)' : undefined;
   const y = cue.y ?? (side ? 960 : 900);
   return (
     <div
@@ -103,7 +108,7 @@ const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
         }
         return (
           <div key={li} style={{fontSize: fs, display: 'flex', gap: fs * 0.24, flexWrap: 'wrap', justifyContent: side ? 'flex-start' : 'center', maxWidth: W - 200}}>
-            {ws.map((w, wi) => <Word key={wi} t={t} at={times[li][wi]} text={w} cue={cue} />)}
+            {ws.map((w, wi) => <Word key={wi} t={t} at={times[li][wi]} text={w} cue={cue} glow={glow} />)}
           </div>
         );
       })}

@@ -72,7 +72,7 @@ export const Montage: React.FC<{ids: number[]; t0: number; t1: number; o: number
     <AbsoluteFill>
       {inner}
       {/* soft right-side falloff so white captions read without a text shadow */}
-      {shade && <AbsoluteFill style={{background: 'linear-gradient(270deg, rgba(20,16,4,.42) 0%, rgba(20,16,4,.12) 45%, rgba(20,16,4,0) 70%)'}} />}
+      {shade && <AbsoluteFill style={{background: 'linear-gradient(270deg, rgba(20,16,4,.55) 0%, rgba(20,16,4,.22) 50%, rgba(20,16,4,0) 78%)'}} />}
     </AbsoluteFill>
   );
 };
@@ -195,7 +195,8 @@ export const Stamp: React.FC<{id: number; w: number; h: number; offset?: number}
 export const Kashida: React.FC<{right: string; left: string; px: number}> = ({right, left, px}) => (
   <span style={{whiteSpace: 'nowrap'}}>
     {right}
-    <span style={{display: 'inline-block', width: px, overflow: 'hidden', verticalAlign: 'top', whiteSpace: 'nowrap'}}>
+    {/* clip horizontally only — vertical overflow stays visible so the stroke is never cut */}
+    <span style={{display: 'inline-block', width: px, clipPath: 'inset(-0.6em 0 -0.8em 0)', verticalAlign: 'top', whiteSpace: 'nowrap', direction: 'rtl'}}>
       <span>{'ـ'.repeat(40)}</span>
     </span>
     {left}
