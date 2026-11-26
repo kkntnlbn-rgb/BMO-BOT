@@ -20,13 +20,26 @@ const CH: Ch[] = [
   {t0: 0, t1: 1.64, in: 'none', el: (o) => <Opening o={o} />},
   {t0: 1.64, t1: 2.93, in: 'push-left', el: (o) => <Reel o={o} ids={[7, 2]} t0={1.64} t1={2.93} />},
   {t0: 2.93, t1: 4.33, in: 'flash', el: (o) => <MarkGround o={o} color={C.oliveMid} t0={2.93} y={240} size={330} />},
-  {t0: 4.33, t1: 7.58, in: 'push-left', el: (o) => <Reel o={o} ids={[8, 9, 12, 23]} t0={4.33} t1={7.58} weights={[1, 1.2, 0.9, 1.1]} />},
+  {t0: 4.33, t1: 7.58, in: 'push-left', el: (o) => <Reel o={o} ids={[8, 9, 12, 23]} t0={4.33} t1={7.58} weights={[1, 1.2, 0.9, 1.1]} ground={C.olive} />},
   {t0: 7.58, t1: 10.46, in: 'push-up', el: (o) => <Stamps o={o} />},
   {t0: 10.46, t1: 12.25, in: 'cut', el: (o) => <Plain o={o} color={C.sand} />},
   {t0: 12.25, t1: 14.53, in: 'flash', el: (o) => <MarkGround o={o} color={C.olive} t0={12.25} y={250} size={300} />},
   {t0: 14.53, t1: 16.61, in: 'push-left', el: (o) => <Reel o={o} ids={[5, 21, 24]} t0={14.53} t1={16.61} />},
   {t0: 16.61, t1: 19.45, in: 'flash', el: (o) => <MarkGround o={o} color={C.oliveMid} t0={16.61} y={240} size={300} />},
-  {t0: 19.45, t1: 22.67, in: 'push-left', el: (o) => <Reel o={o} ids={[19, 26, 14, 15]} t0={19.45} t1={22.67} />},
+  {t0: 19.45, t1: 22.67, in: 'push-left', el: (o) => (
+      <Reel
+        o={o}
+        ids={[19, 26, 14, 15]}
+        t0={19.45}
+        t1={22.67}
+        ground={C.oliveMid}
+        tags={[
+          {x: 110, y: 560, r: -8, at: 20.3, text: 'حيّاكم'},
+          {x: 120, y: 1330, r: 6, at: 20.9, text: 'مقهى دار'},
+          {x: 560, y: 1430, r: -4, at: 21.5, text: 'الفناتير'},
+        ]}
+      />
+    )},
   {t0: 22.67, t1: 25.94, in: 'flash', el: (o) => <Reel o={o} ids={[36, 50, 54, 52, 53]} t0={22.67} t1={25.94} weights={[1, 1, 0.8, 1, 1]} />},
   {t0: 25.94, t1: 27.4, in: 'cut', el: (o) => <LogoDrop o={o} />},
   {t0: 27.4, t1: 30.48, in: 'push-up', el: (o) => <MapScene o={o} />},

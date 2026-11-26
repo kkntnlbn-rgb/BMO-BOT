@@ -59,16 +59,16 @@ const CueView: React.FC<{cue: Cue; t: number}> = ({cue, t}) => {
   const times = wordTimes(cue);
   const out = p(t, cue.to - 0.18, 0.4, easeInOut); // exit upward with blur
   const side = cue.mode === 'side' || (!cue.mode && !cue.pills);
-  const size = cue.size ?? (side ? 116 : 132);
+  const size = cue.size ?? (side ? 104 : 124);
   const ink = cue.ink ?? C.white;
-  const y = cue.y ?? (side ? 1240 : 900);
+  const y = cue.y ?? (side ? 960 : 900);
   return (
     <div
       dir="rtl"
       style={{
         position: 'absolute',
         top: y,
-        right: side || cue.pills ? 86 : 70,
+        right: side || cue.pills ? 64 : 70,
         left: side || cue.pills ? 120 : 70,
         transform: `translateY(-50%) translateY(${-out * 90}px)`,
         filter: `blur(${out * 10}px)`,

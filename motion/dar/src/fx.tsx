@@ -37,12 +37,15 @@ export const Shot: React.FC<{id: number; len: number; t0: number; offset?: numbe
 };
 
 /** A run of shots cut on the beat inside [t0, t1] (absolute seconds), reference-style montage */
-export const Montage: React.FC<{ids: number[]; t0: number; t1: number; o: number; weights?: number[]; shade?: boolean}> = ({ids, t0, t1, o, weights, shade = true}) => {
+export const Montage: React.FC<{ids: number[]; t0: number; t1: number; o: number; weights?: number[]; shade?: boolean; ground?: string}> = ({ids, t0, t1, o, weights, shade = true, ground}) => {
   const w = weights ?? ids.map(() => 1);
   const sum = w.reduce((a, b) => a + b, 0);
   let acc = t0;
-  return (
-    <AbsoluteFill>
+  const card = !!ground;
+  const t = useS() + o;
+  const pop = p(t, t0, 0.55, backOut);
+  const inner = (
+    <>
       {ids.map((id, i) => {
         const len = ((t1 - t0) * w[i]) / sum;
         const st = acc;
@@ -54,9 +57,60 @@ export const Montage: React.FC<{ids: number[]; t0: number; t1: number; o: number
           </Sequence>
         );
       })}
+    </>
+  );
+  if (card) {
+    return (
+      <AbsoluteFill style={{background: ground}}>
+        <div style={{position: 'absolute', left: 180, top: 380, width: 720, height: 1100, overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,.35)', transform: `scale(${0.86 + 0.14 * pop})`, opacity: Math.min(1, pop * 2)}}>
+          {inner}
+        </div>
+      </AbsoluteFill>
+    );
+  }
+  return (
+    <AbsoluteFill>
+      {inner}
       {/* soft right-side falloff so white captions read without a text shadow */}
       {shade && <AbsoluteFill style={{background: 'linear-gradient(270deg, rgba(20,16,4,.42) 0%, rgba(20,16,4,.12) 45%, rgba(20,16,4,0) 70%)'}} />}
     </AbsoluteFill>
+  );
+};
+
+/** Stop-motion paper tags (10–12fps quantized jitter), like the reference's «ص ٢٠٢٣» slips */
+export const PaperTags: React.FC<{t: number; items: {x: number; y: number; r: number; at: number; text: string}[]}> = ({t, items}) => {
+  const q = Math.floor(t * 12) / 12;
+  return (
+    <>
+      {items.map((it, i) => {
+        if (q < it.at) return null;
+        const jx = (random('tx' + i + Math.floor(q * 12)) - 0.5) * 3;
+        const jy = (random('ty' + i + Math.floor(q * 12)) - 0.5) * 3;
+        const jr = (random('tr' + i + Math.floor(q * 12)) - 0.5) * 1.2;
+        return (
+          <div
+            key={i}
+            dir="rtl"
+            style={{
+              position: 'absolute',
+              left: it.x + jx,
+              top: it.y + jy,
+              transform: `rotate(${it.r + jr}deg)`,
+              background: C.frame,
+              padding: '14px 30px 22px',
+              fontFamily: F.head,
+              fontWeight: 900,
+              fontSize: 58,
+              color: C.olive,
+              boxShadow: '0 10px 18px rgba(0,0,0,.3), inset 0 -6px 0 rgba(0,0,0,.05)',
+              borderRadius: 4,
+            }}
+          >
+            {it.text}
+          </div>
+        );
+      })}
+    </>
   );
 };
 

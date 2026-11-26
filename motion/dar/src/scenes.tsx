@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, staticFile} from 'remotion';
-import {DarMark3D, Glints, Ground, Montage, Shot, Stamp} from './fx';
+import {DarMark3D, Glints, Ground, Montage, PaperTags, Shot, Stamp} from './fx';
 import {SceneCaptions} from './Captions';
 import {C, F, H, W, backOut, easeInOut, easeOut, p, useS} from './theme';
 
@@ -35,7 +35,15 @@ export const MarkGround: React.FC<P & {color: string; mark?: 'cream' | 'olive'; 
 };
 
 /* montage wrapper with absolute times */
-export const Reel: React.FC<P & {ids: number[]; t0: number; t1: number; weights?: number[]}> = ({o, ids, t0, t1, weights}) => <Montage ids={ids} t0={t0} t1={t1} o={o} weights={weights} />;
+export const Reel: React.FC<P & {ids: number[]; t0: number; t1: number; weights?: number[]; ground?: string; tags?: {x: number; y: number; r: number; at: number; text: string}[]}> = ({o, ids, t0, t1, weights, ground, tags}) => {
+  const t = useT(o);
+  return (
+    <AbsoluteFill>
+      <Montage ids={ids} t0={t0} t1={t1} o={o} weights={weights} ground={ground} />
+      {tags && <PaperTags t={t} items={tags} />}
+    </AbsoluteFill>
+  );
+};
 
 /* 7.58 «بغيناه مكان… بين أهلك» — perforated stamps fly in and stack in 3D, then fly off */
 const STAMPS = [
@@ -88,53 +96,62 @@ export const LogoDrop: React.FC<P> = ({o}) => {
   );
 };
 
-/* 27.4 the map: a tilted 3D sheet, roads draw on, pins drop on النعيرية then الفناتير */
+/* 27.4 the map (reference look): flat top-down, dark sea, brand-olive land, light roads; the camera
+   drifts from النعيرية to الفناتير while white pins drop with bilingual labels */
+const LAND = 'M0 0 H700 C 690 140, 760 220, 720 330 S 800 520, 760 640 S 860 820, 820 960 S 900 1180, 870 1320 S 960 1560, 1000 1700 L1000 2400 H0 Z';
 const ROADS = [
-  'M120 980 C 300 900, 420 760, 560 700 S 820 560, 960 420',
-  'M200 300 C 320 420, 380 560, 420 700 S 520 980, 640 1180',
-  'M80 620 C 260 640, 460 640, 700 600 S 960 520, 1000 520',
-  'M420 700 L 760 470',
+  'M80 1900 C 200 1600, 260 1300, 330 1100 S 520 700, 640 380',
+  'M40 1250 C 220 1200, 420 1150, 600 1000 S 780 860, 840 820',
+  'M330 1100 C 400 1300, 520 1500, 700 1640 S 880 1800, 960 1900',
+  'M120 600 C 260 650, 360 720, 430 880 S 560 1180, 640 1260',
+  'M250 300 C 300 500, 320 700, 330 1100',
 ];
-const COAST = 'M760 0 C 800 160, 700 260, 760 400 S 900 560, 860 760 S 980 1000, 1080 1100 L1080 0 Z';
-const Pin: React.FC<{x: number; y: number; at: number; t: number; label: string; color: string}> = ({x, y, at, t, label, color}) => {
-  const k = p(t, at, 0.6, backOut);
-  const ring = p(t, at + 0.35, 0.8);
+const MINOR = Array.from({length: 26}, (_, i) => {
+  const x = 60 + ((i * 137) % 640);
+  const y = 300 + ((i * 251) % 1500);
+  return `M${x} ${y} l ${40 + (i % 5) * 18} ${-20 + (i % 7) * 9}`;
+});
+const MapPin: React.FC<{x: number; y: number; at: number; t: number; ar: string; en: string}> = ({x, y, at, t, ar, en}) => {
+  const k = p(t, at, 0.55, backOut);
+  const lab = p(t, at + 0.25, 0.4);
   return (
     <div style={{position: 'absolute', left: x, top: y, opacity: t < at ? 0 : 1}}>
-      <div style={{position: 'absolute', left: -60, top: -20, width: 120, height: 40, borderRadius: '50%', border: `4px solid ${color}`, transform: `scale(${0.3 + ring * 1.6})`, opacity: 1 - ring}} />
-      <div style={{position: 'absolute', left: -26, top: -6, width: 52, height: 16, borderRadius: '50%', background: 'rgba(20,16,4,.35)', filter: 'blur(4px)', transform: `scale(${k})`}} />
-      <svg viewBox="0 0 60 84" width={60} height={84} style={{position: 'absolute', left: -30, top: -84 - (1 - k) * 260, filter: 'drop-shadow(0 10px 10px rgba(20,16,4,.35))'}}>
-        <path d="M30 0 C 13 0 0 13 0 30 C 0 52 30 84 30 84 C 30 84 60 52 60 30 C 60 13 47 0 30 0 Z" fill={color} />
-        <circle cx="30" cy="29" r="11" fill={C.frame} />
+      <svg viewBox="0 0 40 56" width={54} height={76} style={{position: 'absolute', left: -27, top: -76 - (1 - k) * 180}}>
+        <path d="M20 0 C 9 0 0 9 0 20 C 0 35 20 56 20 56 C 20 56 40 35 40 20 C 40 9 31 0 20 0 Z" fill="#ffffff" />
+        <circle cx="20" cy="20" r="7" fill={C.olive} />
       </svg>
-      <div dir="rtl" style={{position: 'absolute', left: -200, width: 400, top: 10, textAlign: 'center', fontFamily: F.head, fontWeight: 900, fontSize: 58, color: C.olive, opacity: p(t, at + 0.3, 0.4), transform: `translateY(${(1 - p(t, at + 0.3, 0.4)) * 16}px)`}}>
-        {label}
+      <div style={{position: 'absolute', left: -220, width: 440, top: -190, textAlign: 'center', color: '#fff', fontFamily: F.head, fontWeight: 900, lineHeight: 1.05, opacity: lab, transform: `translateY(${(1 - lab) * 14}px)`}}>
+        <div style={{fontSize: 48, letterSpacing: 1}}>{en}</div>
+        <div dir="rtl" style={{fontSize: 52}}>{ar}</div>
       </div>
     </div>
   );
 };
 export const MapScene: React.FC<P> = ({o}) => {
   const t = useT(o);
-  const tilt = interpolate(p(t, 27.3, 1.6, easeInOut), [0, 1], [52, 38]);
-  const route = p(t, 28.75, 0.9, easeInOut);
+  const pan = p(t, 27.6, 2.6, easeInOut);
+  const camY = interpolate(pan, [0, 1], [-420, -980]);
+  const camX = interpolate(pan, [0, 1], [-40, -260]);
+  const z = interpolate(pan, [0, 1], [1.05, 1.3]);
+  const route = p(t, 28.9, 0.9, easeInOut);
   return (
-    <AbsoluteFill style={{perspective: 1700}}>
-      <Ground color={C.olive} />
-      <div style={{position: 'absolute', left: 0, top: 260, width: W, height: 1300, transformStyle: 'preserve-3d', transform: `rotateX(${tilt}deg) scale(${1.08 + (t - 27.4) * 0.02})`, transformOrigin: '50% 60%'}}>
-        <svg width={W} height={1300} style={{position: 'absolute', inset: 0}}>
-          <rect width={W} height={1300} rx={40} fill={C.sand} />
-          <path d={COAST} fill={C.oliveMid} opacity={0.55} />
-          {ROADS.map((d, i) => (
-            <path key={i} d={d} fill="none" stroke={C.frame} strokeWidth={i === 3 ? 0 : 14} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p(t, 27.5 + i * 0.18, 0.9, easeOut)} />
+    <AbsoluteFill style={{background: '#232017', overflow: 'hidden'}}>
+      <div style={{position: 'absolute', left: 0, top: 0, width: 1000, height: 2400, transformOrigin: '0 0', transform: `translate(${camX}px, ${camY}px) scale(${z})`}}>
+        <svg width={1000} height={2400} style={{position: 'absolute', inset: 0}}>
+          <path d={LAND} fill={C.olive} />
+          {MINOR.map((d, i) => (
+            <path key={i} d={d} stroke={C.oliveMid} strokeWidth={4} opacity={0.6} />
           ))}
-          {/* the journey: النعيرية → الفناتير */}
-          <path d={ROADS[3]} fill="none" stroke={C.terracotta} strokeWidth={10} strokeDasharray="22 18" strokeLinecap="round" opacity={route > 0 ? 1 : 0} style={{clipPath: `inset(0 ${(1 - route) * 100}% 0 0)`}} />
+          {ROADS.map((d, i) => (
+            <path key={i} d={d} fill="none" stroke={C.sand} strokeWidth={9} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p(t, 27.45 + i * 0.12, 1.0, easeOut)} opacity={0.9} />
+          ))}
+          <path d="M330 1100 C 480 1180, 600 1330, 700 1640" fill="none" stroke={C.terracotta} strokeWidth={9} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - route} />
+          {[{x: 300, y: 1050}, {x: 560, y: 960}, {x: 690, y: 1720}].map((r, i) => (
+            <rect key={i} x={r.x} y={r.y} width={40} height={28} rx={4} fill="none" stroke={C.sand} strokeWidth={3} opacity={0.7} />
+          ))}
         </svg>
-        <Pin x={420} y={700} at={27.85} t={t} label="النعيرية" color={C.olive} />
-        <Pin x={760} y={470} at={29.45} t={t} label="الفناتير" color={C.terracotta} />
-      </div>
-      <div dir="rtl" style={{position: 'absolute', top: 150, width: W, textAlign: 'center', fontFamily: F.head, fontWeight: 900, fontSize: 84, color: C.sand, opacity: p(t, 27.6, 0.5), transform: `translateY(${(1 - p(t, 27.6, 0.5)) * 30}px)`}}>
-        فرعنا الثاني بالجبيل
+        <MapPin x={330} y={1100} at={27.9} t={t} ar="النعيرية" en="Al Nairyah" />
+        <MapPin x={700} y={1640} at={29.4} t={t} ar="الجبيل — الفناتير" en="Jubail · Alfanateer" />
       </div>
     </AbsoluteFill>
   );
