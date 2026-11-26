@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame}
 import {CameraMotionBlur} from '@remotion/motion-blur';
 import {Captions} from './Captions';
 import {ChromaFlash, TicketFrame} from './fx';
-import {Ending, LogoBuild, LogoDrop, MapScene, MarkGround, Opening, Plain, Promise, Reel, Stamps} from './scenes';
+import {Ending, LogoBuild, LogoDrop, MapScene, MarkGround, Opening, Promise, Reel, Stamps} from './scenes';
 import {C, H, W, loadFonts, panEase, sec, useS} from './theme';
 
 loadFonts();
@@ -22,10 +22,10 @@ const CH: Ch[] = [
   {t0: 2.93, t1: 4.33, in: 'flash', el: (o) => <MarkGround o={o} color={C.oliveMid} t0={2.93} y={240} size={330} />},
   {t0: 4.33, t1: 7.58, in: 'push-left', el: (o) => <Reel o={o} ids={[8, 9, 12, 23]} t0={4.33} t1={7.58} weights={[1, 1.2, 0.9, 1.1]} ground={C.olive} />},
   {t0: 7.58, t1: 10.46, in: 'push-up', el: (o) => <Stamps o={o} />},
-  {t0: 10.46, t1: 12.25, in: 'cut', el: (o) => <Plain o={o} color={C.sand} />},
-  {t0: 12.25, t1: 14.53, in: 'flash', el: (o) => <MarkGround o={o} color={C.olive} t0={12.25} y={250} size={300} />},
+  {t0: 10.46, t1: 12.25, in: 'cut', el: (o) => <Reel o={o} ids={[0, 4]} t0={10.46} t1={12.25} />},
+  {t0: 12.25, t1: 14.53, in: 'flash', el: (o) => <Reel o={o} ids={[6, 7]} t0={12.25} t1={14.53} />},
   {t0: 14.53, t1: 16.61, in: 'push-left', el: (o) => <Reel o={o} ids={[5, 21, 24]} t0={14.53} t1={16.61} />},
-  {t0: 16.61, t1: 19.45, in: 'flash', el: (o) => <MarkGround o={o} color={C.oliveMid} t0={16.61} y={240} size={300} />},
+  {t0: 16.61, t1: 19.45, in: 'flash', el: (o) => <Reel o={o} ids={[29, 31]} t0={16.61} t1={19.45} />},
   {t0: 19.45, t1: 22.67, in: 'push-left', el: (o) => (
       <Reel
         o={o}
